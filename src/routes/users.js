@@ -3,37 +3,42 @@ let router = express.Router();
 var mongoose = require("mongodb");
 const { ObjectId } = mongoose;
 const USERS = require("../models/users");
-let axios = require("axios");
+// let axios = require("axios");
+async function foo(){
+  await USERS.insertMany({})
+}
+foo()
 
 router.post("/login", async (req, res, next) => {
   try {
-    const payload = req.body;
-    console.log("🚀 ~ payload:", payload)
-    const adAcc = await axios.post("http://10.200.90.152:4038/AzureLogin/getByCondition", {
-      username: payload.username,
-      password: payload.password,
-    });
-    console.log("🚀 ~ adAcc:", adAcc.data);
-    if (adAcc?.data == "User not found") {
-      const resDB = await USERS.aggregate([
-        {
-          $match: {
-            employeeCode: payload.username,
-            employeeCode: payload.password,
-          },
-        },
-      ]);
-        res.json(resDB);
-    } else {
-      const resDB = await USERS.aggregate([
-        {
-          $match: {
-            employee_code: adAcc.data.description,
-          },
-        },
-      ]);
-      res.json(resDB);
-    }
+    res.send('ok')
+    // const payload = req.body;
+    // console.log("🚀 ~ payload:", payload)
+    // const adAcc = await axios.post("http://10.200.90.152:4038/AzureLogin/getByCondition", {
+    //   username: payload.username,
+    //   password: payload.password,
+    // });
+    // console.log("🚀 ~ adAcc:", adAcc.data);
+    // if (adAcc?.data == "User not found") {
+    //   const resDB = await USERS.aggregate([
+    //     {
+    //       $match: {
+    //         employeeCode: payload.username,
+    //         employeeCode: payload.password,
+    //       },
+    //     },
+    //   ]);
+    //     res.json(resDB);
+    // } else {
+    //   const resDB = await USERS.aggregate([
+    //     {
+    //       $match: {
+    //         employee_code: adAcc.data.description,
+    //       },
+    //     },
+    //   ]);
+    //   res.json(resDB);
+    // }
   } catch (error) {
     console.log("🚀 ~ error:", error);
     res.sendStatus(500);
