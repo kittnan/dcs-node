@@ -28,6 +28,11 @@ let Users = require("./src/routes/users");
 app.use("/users", Users);
 
 
+let master_machine = require("./src/routes/master-machine");
+app.use("/master_machine", master_machine);
+
+
+
 
 app.use(function (req, res, next) {
   res.setHeader("Access-Control-Allow-Origin", "*");

@@ -4,10 +4,6 @@ var mongoose = require("mongodb");
 const { ObjectId } = mongoose;
 const USERS = require("../models/users");
 // let axios = require("axios");
-async function foo(){
-  await USERS.insertMany({})
-}
-foo()
 
 router.post("/login", async (req, res, next) => {
   try {
