@@ -3,15 +3,7 @@ const Schema = mongoose.Schema;
 
 const model = new Schema(
   {
-    employeeCode: String,
-    firstName: String,
-    lastName: String,
-    email: String,
-    access: [],
-    corporate: String,
-    department: String,
-    sectionName: String,
-    sectionCode: String,
+    username: String,
     active: {
       type: Boolean,
       default: true,
