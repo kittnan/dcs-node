@@ -1,6 +1,4 @@
-
-
-
+var mongoose = require("mongodb");
 const { ObjectId } = mongoose;
 let express = require("express");
 let router = express.Router();

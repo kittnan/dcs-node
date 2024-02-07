@@ -26,9 +26,6 @@ app.use(bodyParser.urlencoded({ limit: "50mb", extended: true }));
 app.use(cors());
 app.use(compression());
 
-let Users = require("./src/routes/users");
-app.use("/users", Users);
-
 
 
 app.use(function (req, res, next) {
@@ -59,11 +56,15 @@ const jwtValidate = (req, res, next) => {
 };
 
 
+
 let Users = require("./src/routes/users");
 app.use("/users", Users);
 
 let Auth = require("./src/routes/auth");
 app.use("/auth", Auth);
+
+let Machine = require("./src/routes/master-machine");
+app.use("/machine", Machine);
 
 app.get('/', (req, res) => {
   try {
