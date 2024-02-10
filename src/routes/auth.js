@@ -9,19 +9,19 @@ require("dotenv").config()
 const USERS = require("../models/users");
 
 router.post("/login", async (req, res) => {
-  const { name } = req.body
-
+  const decodedCredentials = Buffer.from(req.headers["authorization"].replace("Basic ", ""), 'base64').toString('utf-8');
+  let payload = JSON.parse(decodedCredentials)
   let user = await USERS.aggregate([
     {
       $match: {
-        username: name
+        username: payload.name
       }
     }
   ])
 
   user = user?.length > 0 ? user[0] : null
   if (!user) {
-    return res.send(400)
+    return res.sendStatus(400)
   }
 
   const access_token = jwtGenerate(user)
@@ -39,7 +39,7 @@ const jwtGenerate = (user) => {
   const accessToken = jwt.sign(
     { name: user.username, id: user._id },
     process.env.ACCESS_TOKEN_SECRET,
-    { expiresIn: "1m", algorithm: "HS256" }
+    { expiresIn: "5s", algorithm: "HS256" }
   )
 
   return accessToken
@@ -49,7 +49,7 @@ const jwtRefreshTokenGenerate = (user) => {
   const refreshToken = jwt.sign(
     { name: user.username, id: user._id },
     process.env.REFRESH_TOKEN_SECRET,
-    { expiresIn: "1d", algorithm: "HS256" }
+    { expiresIn: "10s", algorithm: "HS256" }
   )
 
   return refreshToken
@@ -84,9 +84,7 @@ const jwtRefreshTokenValidate = (req, res, next) => {
     const token = req.headers["authorization"].replace("Bearer ", "")
 
     jwt.verify(token, process.env.REFRESH_TOKEN_SECRET, (err, decoded) => {
-      console.log(req.user);
       if (err) throw new Error(err)
-
       req.user = decoded
       req.user.token = token
       delete req.user.exp
@@ -103,14 +101,13 @@ router.post("/refresh", jwtRefreshTokenValidate, async (req, res) => {
   let user = await USERS.aggregate([
     {
       $match: {
-        username: req.body.username,
-        _id: new ObjectId(req.body._id)
+        username: req.user.name,
+        _id: new ObjectId(req.user.id)
       }
     }
   ])
 
   user = user?.length > 0 ? user[0] : null
-
   if (!user) return res.sendStatus(401)
 
   const access_token = jwtGenerate(user)

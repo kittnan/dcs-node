@@ -2,7 +2,8 @@ let express = require("express");
 let router = express.Router();
 var mongoose = require("mongodb");
 const { ObjectId } = mongoose;
-
+const jwt = require("jsonwebtoken")
+require("dotenv").config()
 const USERS = require("../models/users");
 // let axios = require("axios");
 
@@ -64,7 +65,21 @@ router.post("/create", async (req, res, next) => {
 });
 
 
+const jwtValidate = (req, res, next) => {
+  try {
+    if (!req.headers["authorization"]) return res.sendStatus(401)
 
+    const token = req.headers["authorization"].replace("Bearer ", "")
+
+    jwt.verify(token, process.env.ACCESS_TOKEN_SECRET, (err, decoded) => {
+      if (err) throw new Error(err)
+    })
+    next()
+  } catch (error) {
+    console.log("🚀 ~ error:", error)
+    return res.sendStatus(403)
+  }
+}
 router.get("/", async (req, res, next) => {
   try {
     let { access, active = true } = req.query
