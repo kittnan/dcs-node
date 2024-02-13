@@ -63,7 +63,7 @@ let Auth = require("./src/routes/auth");
 app.use("/auth", Auth);
 
 let Machine = require("./src/routes/master-machine");
-app.use("/machine", Machine);
+app.use("/machine",jwtValidate, Machine);
 
 let User = require("./src/routes/master-user");
 app.use("/user", User);

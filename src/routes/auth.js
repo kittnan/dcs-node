@@ -6,11 +6,12 @@ const { ObjectId } = mongoose;
 const jwt = require("jsonwebtoken")
 require("dotenv").config()
 
-const USERS = require("../models/users");
+const USERS = require("../models/master-user");
 
 router.post("/login", async (req, res) => {
   const decodedCredentials = Buffer.from(req.headers["authorization"].replace("Basic ", ""), 'base64').toString('utf-8');
   let payload = JSON.parse(decodedCredentials)
+  console.log("🚀 ~ payload:", payload)
   let user = await USERS.aggregate([
     {
       $match: {
@@ -27,12 +28,14 @@ router.post("/login", async (req, res) => {
 
   const access_token = jwtGenerate(user)
   const refresh_token = jwtRefreshTokenGenerate(user)
-
+  delete user.password
+  const profile = user
   user.refresh = refresh_token
 
   res.json({
     access_token,
     refresh_token,
+    profile
   })
 })
 
