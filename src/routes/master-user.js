@@ -4,16 +4,16 @@ let express = require("express");
 let router = express.Router();
 // ! USE --------------------- Set VARIABLE ------------------------------------------------------------------------
 
-const MasterMC = require("../models/master-machine");
+const MasterUser = require("../models/master-user");
 
 // ? ------------------------------------------------------ Master
 // * add
-
+ 
 
 router.post("/", async function (req, res, next) {
   try {
     const payload = req.body;
-    let add = await MasterMC.insertMany(payload)
+    let add = await MasterUser.insertMany(payload)
     res.json(add)
   } catch (error) {
     res.send(500)
@@ -26,7 +26,7 @@ router.post("/", async function (req, res, next) {
 router.get("/", async function (req, res, next) {
   try {
     const payload = req.body;
-    let data = await MasterMC.find(payload)
+    let data = await MasterUser.find(payload)
     res.json(data)
   } catch (error) {
     res.send(500)
@@ -39,7 +39,7 @@ router.put("/insert/:id", async function (req, res, next) {
   const payload = req.body;
   try {
     const payload = req.body;
-    let data = await MasterMC.findByIdAndUpdate(
+    let data = await MasterUser.findByIdAndUpdate(
       { _id: id },
       { $set: payload })
     res.json(data)
@@ -52,7 +52,7 @@ router.put("/insert/:id", async function (req, res, next) {
 router.delete("/:id", async function (req, res, next) {
   const { id } = req.params;
   try {
-    let data = await MasterMC.deleteOne({ _id: id })
+    let data = await MasterUser.deleteOne({ _id: id })
     res.json(data)
   } catch (error) {
     res.send(500)
@@ -69,7 +69,7 @@ router.delete("/:id", async function (req, res, next) {
 router.post("/getByCondition",async function (req, res, next) {
   const payload = req.body;
   try {
-    let data = await MasterMC.find(payload)
+    let data = await MasterUser.find(payload)
     res.json(data)
   } catch (error) {
     res.send(500)
@@ -79,7 +79,7 @@ router.post("/getByCondition",async function (req, res, next) {
 router.post("/DelByCondition",async function (req, res, next) {
   const payload = req.body;
   try {
-    let data = await MasterMC.deleteMany(payload);
+    let data = await MasterUser.deleteMany(payload);
     res.json(data);
   } catch (error) {
     res.status(500).send("Internal Server Error");

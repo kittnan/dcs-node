@@ -65,6 +65,11 @@ app.use("/auth", Auth);
 let Machine = require("./src/routes/master-machine");
 app.use("/machine", Machine);
 
+let User = require("./src/routes/master-user");
+app.use("/user", User);
+
+ 
+
 app.get('/', (req, res) => {
   try {
     res.send('ok')
