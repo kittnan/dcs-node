@@ -14,7 +14,8 @@ router.post("/login", async (req, res) => {
   let user = await USERS.aggregate([
     {
       $match: {
-        username: payload.name
+        username: payload.username,
+        password: payload.password,
       }
     }
   ])
