@@ -53,7 +53,7 @@ const jwtRefreshTokenGenerate = (user) => {
   const refreshToken = jwt.sign(
     { name: user.username, id: user._id },
     process.env.REFRESH_TOKEN_SECRET,
-    { expiresIn: "1d", algorithm: "HS256" }
+    { expiresIn: "12h", algorithm: "HS256" }
   )
 
   return refreshToken
