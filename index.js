@@ -73,6 +73,9 @@ let Report = require("./src/routes/report");
 app.use("/report", jwtValidate, Report);
 
 
+let serviceTypeOption = require("./src/routes/master-serviceTypeOption");
+app.use("/serviceTypeOption", jwtValidate, serviceTypeOption);
+
 
 app.get('/', (req, res) => {
   try {
