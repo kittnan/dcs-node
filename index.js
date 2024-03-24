@@ -66,8 +66,8 @@ app.use("/auth", Auth);
 let Machine = require("./src/routes/master-machine");
 app.use("/machine", jwtValidate, Machine);
 
-let User = require("./src/routes/master-user");
-app.use("/user", User);
+// let User = require("./src/routes/master-user");
+// app.use("/user", User);
 
 let Report = require("./src/routes/report");
 app.use("/report", jwtValidate, Report);
