@@ -72,6 +72,9 @@ app.use("/machine", jwtValidate, Machine);
 let Report = require("./src/routes/report");
 app.use("/report", jwtValidate, Report);
 
+let Report_Special = require("./src/routes/report-special");
+app.use("/report-special", jwtValidate, Report_Special);
+
 
 let serviceTypeOption = require("./src/routes/master-serviceTypeOption");
 app.use("/serviceTypeOption", jwtValidate, serviceTypeOption);
