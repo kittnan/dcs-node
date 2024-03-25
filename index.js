@@ -57,8 +57,8 @@ const jwtValidate = (req, res, next) => {
 
 
 
-let Users = require("./src/routes/users");
-app.use("/users", jwtValidate, Users);
+// let Users = require("./src/routes/users");
+// app.use("/users", jwtValidate, Users);
 
 let Auth = require("./src/routes/auth");
 app.use("/auth", Auth);
@@ -66,8 +66,8 @@ app.use("/auth", Auth);
 let Machine = require("./src/routes/master-machine");
 app.use("/machine", jwtValidate, Machine);
 
-// let User = require("./src/routes/master-user");
-// app.use("/user", User);
+let User = require("./src/routes/master-user");
+app.use("/user", User);
 
 let Report = require("./src/routes/report");
 app.use("/report", jwtValidate, Report);
