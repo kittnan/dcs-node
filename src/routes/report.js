@@ -11,7 +11,7 @@ let path = ''
 
 router.get('', async (req, res) => {
   try {
-    let { active = 'true', no, _id } = req.query
+    let { active = 'true', no, _id, status } = req.query
     let con = [
       {
         $match: {}
@@ -29,6 +29,45 @@ router.get('', async (req, res) => {
       con.push({
         $match: {
           _id: new ObjectId(_id)
+        }
+      })
+    }
+    const result = await REPORT.aggregate(con)
+    res.json(result)
+  } catch (error) {
+    console.log("🚀 ~ error:", error)
+  }
+})
+router.get('/multi', async (req, res) => {
+  try {
+    let { active = 'true', no, _id, status } = req.query
+    let con = [
+      {
+        $match: {}
+      }
+    ]
+    if (active) {
+      active = active == 'true' ? true : false
+      con.push({
+        $match: {
+          active: active
+        }
+      })
+    }
+    if (status) {
+      con.push({
+        $match: {
+          status: status
+        }
+      })
+    }
+    if (_id) {
+       _id = JSON.parse(_id)
+      con.push({
+        $match: {
+          _id: {
+            $in: _id.map(id => new ObjectId(id))
+          }
         }
       })
     }
@@ -98,7 +137,7 @@ router.post('/upload', (req, res) => {
     if (err) {
       return res.status(500).send(err);
     }
-    res.json({ savePath: savePath,readPath: `http://127.0.0.1/img/${uploadedFile.name}` })
+    res.json({ savePath: savePath, readPath: `http://127.0.0.1/img/${uploadedFile.name}` })
   });
 });
 
