@@ -32,6 +32,13 @@ router.get('', async (req, res) => {
         }
       })
     }
+    if (status) {
+      con.push({
+        $match: {
+          status: status
+        }
+      })
+    }
     const result = await REPORT.aggregate(con)
     res.json(result)
   } catch (error) {

@@ -60,24 +60,27 @@ const jwtValidate = (req, res, next) => {
 // let Users = require("./src/routes/users");
 // app.use("/users", jwtValidate, Users);
 
-let Auth = require("./src/routes/auth");
-app.use("/auth", Auth);
+let AUTH_ROUTE = require("./src/routes/auth");
+app.use("/auth", AUTH_ROUTE);
 
-let Machine = require("./src/routes/master-machine");
-app.use("/machine", jwtValidate, Machine);
+let MACHINE_ROUTE = require("./src/routes/master-machine");
+app.use("/machine", jwtValidate, MACHINE_ROUTE);
 
-let User = require("./src/routes/master-user");
-app.use("/user", User);
+let USER_ROUTE = require("./src/routes/master-user");
+app.use("/user", USER_ROUTE);
 
-let Report = require("./src/routes/report");
-app.use("/report", jwtValidate, Report);
+let REPORT_ROUTE = require("./src/routes/report");
+app.use("/report", jwtValidate, REPORT_ROUTE);
 
-let Report_Special = require("./src/routes/report-special");
-app.use("/report-special", jwtValidate, Report_Special);
+let REPORT_SPECIALIST_ROUTE = require("./src/routes/report-special");
+app.use("/report-special", jwtValidate, REPORT_SPECIALIST_ROUTE);
 
 
-let serviceTypeOption = require("./src/routes/master-serviceTypeOption");
-app.use("/serviceTypeOption", jwtValidate, serviceTypeOption);
+let SERVICE_TYPE_OPTION_ROUTE = require("./src/routes/master-serviceTypeOption");
+app.use("/serviceTypeOption", jwtValidate, SERVICE_TYPE_OPTION_ROUTE);
+
+let REPORT_PM_ROUTE = require("./src/routes/report-pm");
+app.use("/report-pm", jwtValidate, REPORT_PM_ROUTE);
 
 
 app.get('/', (req, res) => {

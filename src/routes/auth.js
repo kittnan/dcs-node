@@ -11,7 +11,6 @@ const USERS = require("../models/master-user");
 router.post("/login", async (req, res) => {
   const decodedCredentials = Buffer.from(req.headers["authorization"].replace("Basic ", ""), 'base64').toString('utf-8');
   let payload = JSON.parse(decodedCredentials)
-  console.log("🚀 ~ payload:", payload)
   let user = await USERS.aggregate([
     {
       $match: {
