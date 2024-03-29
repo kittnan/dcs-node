@@ -97,7 +97,7 @@ const jwtRefreshTokenValidate = (req, res, next) => {
     next()
   } catch (error) {
     console.log("🚀 ~ error:", error)
-    return res.sendStatus(403)
+    return res.sendStatus(401)
   }
 }
 
