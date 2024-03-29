@@ -11,7 +11,7 @@ let path = ''
 
 router.get('', async (req, res) => {
   try {
-    let { active = 'true', no, _id } = req.query
+    let { active = 'true', no, _id,status } = req.query
     let con = [
       {
         $match: {}
