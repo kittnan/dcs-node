@@ -163,4 +163,15 @@ router.put("/insert/:id", async function (req, res, next) {
 });
 
 
+//find
+router.post("/getByCondition",async function (req, res, next) {
+  const payload = req.body;
+  try {
+    let data = await REPORT.find(payload)
+    res.json(data)
+  } catch (error) {
+    res.send(500)
+  }
+});
+
 module.exports = router;
