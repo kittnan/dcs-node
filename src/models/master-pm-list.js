@@ -13,6 +13,6 @@ const List = new Schema(
     { timestamps: true, versionKey: false, strict: false }
   );
 
-const ListModule = mongoose.model("pm_check_lists", List);
+const ListModule = mongoose.model("pm_check_list", List);
 
 module.exports = ListModule;
