@@ -148,5 +148,19 @@ router.post('/upload', (req, res) => {
   });
 });
 
+router.put("/insert/:id", async function (req, res, next) {
+  const { id } = req.params;
+  const payload = req.body;
+  try {
+    const payload = req.body;
+    let data = await REPORT.findByIdAndUpdate(
+      { _id: id },
+      { $set: payload })
+    res.json(data)
+  } catch (error) {
+    res.send(500)
+  }
+});
+
 
 module.exports = router;
