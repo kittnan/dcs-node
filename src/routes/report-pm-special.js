@@ -3,7 +3,7 @@ let router = express.Router();
 var mongoose = require("mongodb");
 const { ObjectId } = mongoose;
 require("dotenv").config()
-const REPORT = require("../models/report-pm");
+const REPORT = require("../models/report-pm-special");
 const moment = require("moment");
 
 // let axios = require("axios");
