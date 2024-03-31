@@ -79,8 +79,14 @@ app.use("/report-special", jwtValidate, REPORT_SPECIALIST_ROUTE);
 let SERVICE_TYPE_OPTION_ROUTE = require("./src/routes/master-serviceTypeOption");
 app.use("/serviceTypeOption", jwtValidate, SERVICE_TYPE_OPTION_ROUTE);
 
+let SERVICE_TYPE_OPTION_ROUTE = require("./src/routes/master-pm-list");
+app.use("/pm-list", jwtValidate, SERVICE_TYPE_OPTION_ROUTE);
+
+
 let REPORT_PM_ROUTE = require("./src/routes/report-pm");
 app.use("/report-pm", jwtValidate, REPORT_PM_ROUTE);
+
+
 
 
 app.get('/', (req, res) => {
