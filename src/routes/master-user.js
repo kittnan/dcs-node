@@ -27,6 +27,15 @@ router.get("/", async function (req, res, next) {
   try {
     const payload = req.body;
     let data = await MasterUser.find(payload)
+    data = data.map((a)=>{
+      return {
+          name : a.name,
+          permission : a.permission,
+          telephone : a.telephone,
+          username : a.username,
+          _id : a._id
+      }
+    })
     res.json(data)
   } catch (error) {
     res.send(500)
