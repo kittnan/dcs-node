@@ -135,20 +135,20 @@ router.post('/save', async (req, res) => {
 });
 
 
-router.post('/upload', (req, res) => {
-  if (!req.files || Object.keys(req.files).length === 0) {
-    return res.status(400).send('No files were uploaded.');
-  }
+// router.post('/upload', (req, res) => {
+//   if (!req.files || Object.keys(req.files).length === 0) {
+//     return res.status(400).send('No files were uploaded.');
+//   }
 
-  let uploadedFile = req.files.file;
-  let savePath = 'C:/xampp/htdocs/img/' + uploadedFile.name
-  uploadedFile.mv(savePath, (err) => {
-    if (err) {
-      return res.status(500).send(err);
-    }
-    res.json({ savePath: savePath, readPath: `http://127.0.0.1/img/${uploadedFile.name}` })
-  });
-});
+//   let uploadedFile = req.files.file;
+//   let savePath = 'C:/xampp/htdocs/img/' + uploadedFile.name
+//   uploadedFile.mv(savePath, (err) => {
+//     if (err) {
+//       return res.status(500).send(err);
+//     }
+//     res.json({ savePath: savePath, readPath: `http://127.0.0.1/img/${uploadedFile.name}` })
+//   });
+// });
 
 router.put("/insert/:id", async function (req, res, next) {
   const { id } = req.params;
