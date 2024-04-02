@@ -4,7 +4,11 @@ var mongoose = require("mongodb");
 const { ObjectId } = mongoose;
 require("dotenv").config()
 const REPORT = require("../models/report");
+const REPORT_PM = require("../models/report-pm");
+const SPECIAL = require("../models/report-special");
+const SPECIAL_PM = require("../models/report-pm-special");
 const moment = require("moment");
+
 
 // let axios = require("axios");
 let path = ''
@@ -47,41 +51,207 @@ router.get('', async (req, res) => {
 })
 router.get('/multi', async (req, res) => {
   try {
-    let { active = 'true', no, _id, status } = req.query
+    let { active = 'true', no, _id, status, customer, machine, report, service, type } = req.query
     let con = [
       {
-        $match: {}
+        $match: {
+          status: 'finish'
+        }
       }
     ]
-    if (active) {
-      active = active == 'true' ? true : false
+    report = JSON.parse(report)
+    type = JSON.parse(type)
+
+    customer = JSON.parse(customer)
+    if (customer) {
       con.push({
         $match: {
-          active: active
+          'customer.Customer': customer
         }
       })
     }
-    if (status) {
+    machine = JSON.parse(machine)
+    if (machine) {
       con.push({
         $match: {
-          status: status
+          'machine.Machine': machine
         }
       })
     }
-    if (_id) {
-       _id = JSON.parse(_id)
+    service = JSON.parse(service)
+    if (service) {
       con.push({
         $match: {
-          _id: {
-            $in: _id.map(id => new ObjectId(id))
-          }
+          'serviceType.value': service
         }
       })
     }
-    const result = await REPORT.aggregate(con)
-    res.json(result)
+
+    if (type && report) {
+      if (type == 'engineer' && report == 'report') {
+        let result = await REPORT.aggregate(con)
+        result = result.map(item => {
+          item.type = 'engineer'
+          item.report = 'report'
+          return item
+        })
+        res.json(result)
+
+      }
+      if (type == 'engineer' && report == 'pm') {
+        let result = await REPORT_PM.aggregate(con)
+        result = result.map(item => {
+          item.type = 'engineer'
+          item.report = 'pm'
+          return item
+        })
+        res.json(result)
+
+      }
+      if (type == 'special' && report == 'report') {
+        let result = await SPECIAL.aggregate(con)
+        result = result.map(item => {
+          item.type = 'special'
+          item.report = 'report'
+          return item
+        })
+        res.json(result)
+
+      }
+      if (type == 'special' && report == 'pm') {
+        let result = await SPECIAL_PM.aggregate(con)
+        result = result.map(item => {
+          item.type = 'special'
+          item.report = 'pm'
+          return item
+        })
+        res.json(result)
+
+      }
+    } else if (type) {
+      if (type == 'engineer') {
+        let result = (await REPORT.aggregate(con))
+        result = result.map(item => {
+          item.type = 'engineer'
+          item.report = 'report'
+          return item
+        })
+        let resultPM = await REPORT_PM.aggregate(con)
+        result = result.map(item => {
+          item.type = 'engineer'
+          item.report = 'pm'
+          return item
+        })
+        let merge = [...result, ...resultPM]
+        res.json(merge)
+      }
+      if (type == 'special') {
+        let result = await SPECIAL.aggregate(con)
+        result = result.map(item => {
+          item.type = 'special'
+          item.report = 'report'
+          return item
+        })
+        let resultPM = await SPECIAL_PM.aggregate(con)
+        result = result.map(item => {
+          item.type = 'special'
+          item.report = 'pm'
+          return item
+        })
+        let merge = [...result, ...resultPM]
+        res.json(merge)
+      }
+    } else if (report) {
+      if (report == 'report') {
+        let engineer = await REPORT.aggregate(con)
+        engineer = engineer.map(item => {
+          item.type = 'engineer'
+          item.report = 'report'
+          return item
+        })
+        let special = await SPECIAL.aggregate(con)
+        special = special.map(item => {
+          item.type = 'special'
+          item.report = 'report'
+          return item
+        })
+        let merge = [...engineer, ...special]
+        res.json(merge)
+      }
+      if (report == 'pm') {
+        let engineer = await REPORT_PM.aggregate(con)
+        engineer = engineer.map(item => {
+          item.type = 'engineer'
+          item.report = 'pm'
+          return item
+        })
+        let special = await SPECIAL_PM.aggregate(con)
+        special = special.map(item => {
+          item.type = 'special'
+          item.report = 'pm'
+          return item
+        })
+        let merge = [...engineer, ...special]
+        res.json(merge)
+      }
+    } else {
+      let engineer = await REPORT.aggregate(con)
+      engineer = engineer.map(item => {
+        item.type = 'engineer'
+        item.report = 'report'
+        return item
+      })
+      let engineer2 = await REPORT_PM.aggregate(con)
+      engineer2 = engineer2.map(item => {
+        item.type = 'engineer'
+        item.report = 'pm'
+        return item
+      })
+      let special = await SPECIAL.aggregate(con)
+      special = special.map(item => {
+        item.type = 'special'
+        item.report = 'report'
+        return item
+      })
+      let special2 = await SPECIAL_PM.aggregate(con)
+      special2 = special2.map(item => {
+        item.type = 'special'
+        item.report = 'pm'
+        return item
+      })
+      let merge = [...engineer, ...engineer2, ...special, ...special2]
+      res.json(merge)
+    }
+
+    // if (active) {
+    //   active = active == 'true' ? true : false
+    //   con.push({
+    //     $match: {
+    //       active: active
+    //     }
+    //   })
+    // }
+    // if (status) {
+    //   con.push({
+    //     $match: {
+    //       status: status
+    //     }
+    //   })
+    // }
+    // if (_id) {
+    //   _id = JSON.parse(_id)
+    //   con.push({
+    //     $match: {
+    //       _id: {
+    //         $in: _id.map(id => new ObjectId(id))
+    //       }
+    //     }
+    //   })
+    // }
+
   } catch (error) {
     console.log("🚀 ~ error:", error)
+    res.sendStatus(500)
   }
 })
 
@@ -166,7 +336,7 @@ router.put("/insert/:id", async function (req, res, next) {
 
 
 //find
-router.post("/getByCondition",async function (req, res, next) {
+router.post("/getByCondition", async function (req, res, next) {
   const payload = req.body;
   try {
     let data = await REPORT.find(payload)
