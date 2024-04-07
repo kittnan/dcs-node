@@ -4,7 +4,7 @@ const Schema = mongoose.Schema;
 const model = new Schema(
   {
    finishDate:Date,
-   startDate:Date
+   startDate:Date,
   },
   { timestamps: true, versionKey: false, strict: false }
 );

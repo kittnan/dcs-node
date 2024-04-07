@@ -51,7 +51,7 @@ router.get('', async (req, res) => {
 })
 router.get('/multi', async (req, res) => {
   try {
-    let { active = 'true', no, _id, status, customer, machine, report, service, type } = req.query
+    let { active = 'true', no, _id, status, customer, machine, report, service, type, user } = req.query
     let con = [
       {
         $match: {
@@ -83,6 +83,14 @@ router.get('/multi', async (req, res) => {
       con.push({
         $match: {
           'serviceType.value': service
+        }
+      })
+    }
+    user = JSON.parse(user)
+    if (user) {
+      con.push({
+        $match: {
+          'userActive._id':user._id
         }
       })
     }

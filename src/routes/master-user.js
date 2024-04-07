@@ -8,7 +8,7 @@ const MasterUser = require("../models/master-user");
 
 // ? ------------------------------------------------------ Master
 // * add
- 
+
 
 router.post("/", async function (req, res, next) {
   try {
@@ -27,13 +27,45 @@ router.get("/", async function (req, res, next) {
   try {
     const payload = req.body;
     let data = await MasterUser.find(payload)
-    data = data.map((a)=>{
+    data = data.map((a) => {
       return {
-          name : a.name,
-          permission : a.permission,
-          telephone : a.telephone,
-          username : a.username,
-          _id : a._id
+        name: a.name,
+        permission: a.permission,
+        telephone: a.telephone,
+        username: a.username,
+        _id: a._id
+      }
+    })
+    res.json(data)
+  } catch (error) {
+    res.send(500)
+  }
+});
+
+// get by condition
+
+router.get("/condition", async function (req, res, next) {
+  try {
+    let { permission } = req.query
+    let con = [{ $match: {} }]
+    if (permission) {
+      permission = JSON.parse(permission)
+      con.push({
+        $match: {
+          permission: {
+            $in: permission
+          }
+        }
+      })
+    }
+    let data = await MasterUser.aggregate(con)
+    data = data.map((a) => {
+      return {
+        name: a.name,
+        permission: a.permission,
+        telephone: a.telephone,
+        username: a.username,
+        _id: a._id
       }
     })
     res.json(data)
@@ -71,11 +103,11 @@ router.delete("/:id", async function (req, res, next) {
 
 
 
- 
+
 
 
 //find
-router.post("/getByCondition",async function (req, res, next) {
+router.post("/getByCondition", async function (req, res, next) {
   const payload = req.body;
   try {
     let data = await MasterUser.find(payload)
@@ -85,7 +117,7 @@ router.post("/getByCondition",async function (req, res, next) {
   }
 });
 
-router.post("/DelByCondition",async function (req, res, next) {
+router.post("/DelByCondition", async function (req, res, next) {
   const payload = req.body;
   try {
     let data = await MasterUser.deleteMany(payload);
