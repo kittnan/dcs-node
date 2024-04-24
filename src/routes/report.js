@@ -90,7 +90,7 @@ router.get('/multi', async (req, res) => {
     if (user) {
       con.push({
         $match: {
-          'userActive._id':user._id
+          'userActive._id': user._id
         }
       })
     }
@@ -311,6 +311,25 @@ router.post('/save', async (req, res) => {
     res.sendStatus(500)
   }
 });
+router.post('/saveMultiple', async (req, res) => {
+  try {
+    let payload = req.body
+    if (!payload) throw 'No data'
+    const result = await REPORT.bulkWrite(payload.map(item => {
+      return {
+        updateMany: {
+          filter: { _id: new ObjectId(item._id) },
+          update: { $set: { status: item.status } }
+        }
+      }
+    }))
+    res.json(result)
+  } catch (error) {
+    console.log("🚀 ~ error:", error)
+    res.sendStatus(500)
+  }
+});
+
 
 
 // router.post('/upload', (req, res) => {
