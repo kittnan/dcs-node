@@ -92,6 +92,10 @@ let REPORT_PM_SPECIAL_ROUTE = require("./src/routes/report-pm-special");
 app.use("/report-pm-special", jwtValidate, REPORT_PM_SPECIAL_ROUTE);
 
 
+let TASKS_ROUTE = require("./src/routes/tasks");
+app.use("/tasks", jwtValidate, TASKS_ROUTE);
+
+
 
 
 app.get('/', (req, res) => {
