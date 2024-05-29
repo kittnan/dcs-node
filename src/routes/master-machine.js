@@ -8,6 +8,30 @@ const MasterMC = require("../models/master-machine");
 
 // ? ------------------------------------------------------ Master
 // * add
+// updateObjectId()
+async function updateObjectId(){
+  let data1 = await MasterMC.aggregate([
+    {
+      $match:{}
+    }
+  ])
+  let formData = data1.map(d=>{
+    d.machine_id = new ObjectId(d.machine_id)
+    return {
+      updateOne:{
+        filter:{
+          _id: d._id
+        },
+        update:{
+          $set: d
+        }
+      }
+    }
+  })
+
+let dd=  await MasterMC.bulkWrite(formData)
+console.log("🚀 ~ dd:", dd)
+}
 
 
 router.post("/", async function (req, res, next) {

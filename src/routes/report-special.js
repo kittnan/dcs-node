@@ -11,7 +11,7 @@ let path = ''
 
 router.get('', async (req, res) => {
   try {
-    let { active = 'true', no, _id,status } = req.query
+    let { active = 'true', no, _id, status, start, end } = req.query
     let con = [
       {
         $match: {}
@@ -39,7 +39,27 @@ router.get('', async (req, res) => {
         }
       })
     }
-    const result = await REPORT.aggregate(con)
+    if (start) {
+      con.push({
+        $match: {
+          createdAt: {
+            $gte: moment(start, 'DD-MM-YY').startOf('day').toDate()
+          }
+        }
+      })
+    }
+    if (end) {
+      con.push({
+        $match: {
+          createdAt: {
+            $lte: moment(end, 'DD-MM-YY').endOf('day').toDate()
+          }
+        }
+      })
+    }
+    const result = await REPORT.aggregate(con).sort({
+      createdAt: -1
+    })
     res.json(result)
   } catch (error) {
     console.log("🚀 ~ error:", error)
@@ -123,7 +143,7 @@ router.post('/upload', (req, res) => {
     if (err) {
       return res.status(500).send(err);
     }
-    res.json({ savePath: savePath,readPath: `http://127.0.0.1/img/${uploadedFile.name}` })
+    res.json({ savePath: savePath, readPath: `http://127.0.0.1/img/${uploadedFile.name}` })
   });
 });
 
@@ -142,7 +162,7 @@ router.put("/insert/:id", async function (req, res, next) {
   }
 });
 
-router.post("/getByCondition",async function (req, res, next) {
+router.post("/getByCondition", async function (req, res, next) {
   const payload = req.body;
   try {
     let data = await REPORT.find(payload)

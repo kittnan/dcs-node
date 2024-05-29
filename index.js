@@ -12,8 +12,8 @@ mongoose.set("strictQuery", false);
 const dotenv = require("dotenv");
 const jwt = require("jsonwebtoken")
 
-dotenv.config({ path: `.env.${process.env.NODE_ENV}` });
-// dotenv.config({ path: `.env` });
+// dotenv.config({ path: `.env.${process.env.NODE_ENV}` });
+dotenv.config({ path: `.env` });
 
 console.log("PORT:", process.env.PORT);
 let mongooseConnect = require("./connect");

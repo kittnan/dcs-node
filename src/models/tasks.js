@@ -3,8 +3,9 @@ const Schema = mongoose.Schema;
 
 const model = new Schema(
   {
-  
-  
+    lastPM: Date,
+  machine_id: mongoose.Schema.Types.ObjectId,
+  PIC: mongoose.Schema.Types.ObjectId,
   },
   { timestamps: true, versionKey: false, strict: false }
 );
