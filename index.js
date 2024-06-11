@@ -96,6 +96,10 @@ let TASKS_ROUTE = require("./src/routes/tasks");
 app.use("/tasks", jwtValidate, TASKS_ROUTE);
 
 
+let PM_PLAN = require("./src/routes/pm-plan");
+app.use("/pm-plan", jwtValidate, PM_PLAN);
+
+
 
 
 app.get('/', (req, res) => {
