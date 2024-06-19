@@ -110,10 +110,12 @@ router.delete("/deleteByForm", async function (req, res, next) {
     let resData = await rout.deleteMany({ form: Number(formNum) })
     let formData = await rout.aggregate([{ $match: {} }])
     let formDataUpdate = formData.map(item => {
-      let diff = formNum - item.form
-      let diffAb = Math.abs(diff)
       if (item.form > formNum) {
-        item.form = item.form - diffAb
+        let diff = formNum - item.form
+        let diffAb = Math.abs(diff)
+        if (item.form > formNum) {
+          item.form = item.form - diffAb
+        }
       }
       return {
         updateMany: {
