@@ -61,44 +61,34 @@ const jwtValidate = (req, res, next) => {
 // let Users = require("./src/routes/users");
 // app.use("/users", jwtValidate, Users);
 
-let AUTH_ROUTE = require("./src/routes/auth");
-app.use("/auth", AUTH_ROUTE);
+app.use("/auth", require("./src/routes/auth"));
 
-let MACHINE_ROUTE = require("./src/routes/master-machine");
-app.use("/machine", jwtValidate, MACHINE_ROUTE);
+app.use("/machine", jwtValidate, require("./src/routes/master-machine"));
 
-let USER_ROUTE = require("./src/routes/master-user");
-app.use("/user", USER_ROUTE);
+app.use("/user", require("./src/routes/master-user"));
 
-let REPORT_ROUTE = require("./src/routes/report");
-app.use("/report", jwtValidate, REPORT_ROUTE);
+app.use("/report", jwtValidate, require("./src/routes/report"));
 
-let REPORT_SPECIALIST_ROUTE = require("./src/routes/report-special");
-app.use("/report-special", jwtValidate, REPORT_SPECIALIST_ROUTE);
+app.use("/report-special", jwtValidate, require("./src/routes/report-special"));
 
 
-let SERVICE_TYPE_OPTION_ROUTE = require("./src/routes/master-serviceTypeOption");
-app.use("/serviceTypeOption", jwtValidate, SERVICE_TYPE_OPTION_ROUTE);
+app.use("/serviceTypeOption", jwtValidate, require("./src/routes/master-serviceTypeOption"));
 
-let PM_LIST = require("./src/routes/master-pm-list");
-app.use("/pm-list", jwtValidate, PM_LIST);
+app.use("/pm-list", jwtValidate, require("./src/routes/master-pm-list"));
 
 
-let REPORT_PM_ROUTE = require("./src/routes/report-pm");
-app.use("/report-pm", jwtValidate, REPORT_PM_ROUTE);
+app.use("/report-pm", jwtValidate, require("./src/routes/report-pm"));
 
 
-let REPORT_PM_SPECIAL_ROUTE = require("./src/routes/report-pm-special");
-app.use("/report-pm-special", jwtValidate, REPORT_PM_SPECIAL_ROUTE);
+app.use("/report-pm-special", jwtValidate, require("./src/routes/report-pm-special"));
 
 
-let TASKS_ROUTE = require("./src/routes/tasks");
-app.use("/tasks", jwtValidate, TASKS_ROUTE);
+// app.use("/tasks", jwtValidate, require("./src/routes/tasks"));
 
 
-let PM_PLAN = require("./src/routes/pm-plan");
-app.use("/pm-plan", jwtValidate, PM_PLAN);
+// app.use("/pm-plan", jwtValidate, require("./src/routes/pm-plan"));
 
+app.use("/master-category", jwtValidate, require("./src/routes/master-category"));
 
 
 

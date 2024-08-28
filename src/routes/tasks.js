@@ -188,7 +188,6 @@ router.get('/genPM', async (req, res) => {
     res.sendStatus(500)
   }
 })
-// genPMPlan(2024)
 async function genPMPlan(year) {
   try {
     let con2 = [
@@ -372,7 +371,6 @@ async function genPMPlan(year) {
 
   }
 }
-genPM_by_year(2025)
 async function genPM_by_year(year) {
   try {
     let con2 = [
@@ -435,7 +433,31 @@ async function genPM_by_year(year) {
 
     ]
     let tasks = await TASKS.aggregate(con2)
+    let pm_jobs = await REPORT_PM.aggregate([
+      {
+        $match: {
+          createdAt: {
+            $gte: moment(year, 'YYYY').startOf('year').toDate(),
+            $lte: moment(year, 'YYYY').endOf('year').toDate(),
+          },
+          status: 'finish'
+        }
+      }
+    ])
+    let pm2_jobs = await SPECIAL_PM.aggregate([
+      {
+        $match: {
+          createdAt: {
+            $gte: moment(year, 'YYYY').startOf('year').toDate(),
+            $lte: moment(year, 'YYYY').endOf('year').toDate(),
+          },
+          status: 'finish'
+        }
+      }
+    ])
+    pm_jobs = pm_jobs.concat(pm2_jobs)
     let pm = tasks.map(task => {
+
       let lastPM = task.lastPM ? moment(task.lastPM).format('MM-YY') : moment().format('MM-YY')
       let newLastPM = moment(lastPM, 'MM-YY').clone()
       if (newLastPM.format('YYYY') != year) {
@@ -450,50 +472,89 @@ async function genPM_by_year(year) {
       let pm = []
       let next_pm = moment(newLastPM, 'MM-YY').add(task.target, 'month').format('MM-YY')
       for (let index = 1; index <= 12; index++) {
+
         const monthCur = moment(`1-${index}-${year}`, 'D-M-YYYY').format('MM-YY')
 
-        if (next_pm == monthCur || newLastPM.format('MM-YY') == monthCur) {
+        let historyPM = pm_jobs.find(job => {
+          let dateJob = job.createdAt ? moment(job.createdAt).format('MM-YY') : null
+          if (dateJob == monthCur) return job
+          return null
+        })
+        if (historyPM) {
           newItem = {
-            ...task,
-            pmDate: monthCur
-          }
-          pm.push(newItem)
-          next_pm = moment(monthCur, 'MM-YY').add(task.target, 'month').format('MM-YY')
-        } else {
-          newItem = {
-            ...task,
+            ...historyPM,
             pmDate: monthCur,
-            PIC: null
+            remark: "history"
           }
           pm.push(newItem)
-        }
+        } else
+          if (next_pm == monthCur || newLastPM.format('MM-YY') == monthCur) {
+            newItem = {
+              ...task,
+              pmDate: monthCur,
+              remark: "job1"
+            }
+            pm.push(newItem)
+            next_pm = moment(monthCur, 'MM-YY').add(task.target, 'month').format('MM-YY')
+          } else {
+            newItem = {
+              ...task,
+              pmDate: monthCur,
+              PIC: null,
+              remark: "job2"
+            }
+            pm.push(newItem)
+          }
       }
       return pm
     })
     let pm2 = pm.reduce((p, n) => {
       return p.concat(n)
-    }, [])
+    }, []).sort((a, b) => {
+      if (a.province < b.province) {
+        return -1;
+      } else if (a.province > b.province) {
+        return 1;
+      } else {
+        if (a.customer < b.customer) {
+          return -1;
+        } else if (a.customer > b.customer) {
+          return 1;
+        } else {
+          return 0;
+        }
+      }
+    })
+
+    console.log(pm2);
+    
 
     let pm3 = pm2.reduce((p, n) => {
-      let indexP = p.findIndex(pp => {
-        let pProvince = pp.province ? pp.province : null
+      let indexP = p.findIndex(p_item => {
+        if (p_item.machine_id == n.machine_id) return true
+        return false
+        let pProvince = p_item.province ? p_item.province : null
         let nProvince = n.machine?.Province ? n.machine.Province : null
-        let pCustomer = pp.customer ? pp.customer : null
+        let pCustomer = p_item.customer ? p_item.customer : null
         let nCustomer = n.machine?.Customer ? n.machine.Customer : null
-        let pMachine = pp.machine ? pp.machine : null
+        let pMachine = p_item.machine ? p_item.machine : null
         let nMachine = n.machine?.Machine ? n.machine.Machine : null
-        let pModel = pp.model ? pp.model : null
+        let pModel = p_item.model ? p_item.model : null
         let nModel = n.machine?.Model ? n.machine.Model : null
         if (pProvince && nProvince && pCustomer && nCustomer && pMachine && nMachine && pModel && nModel) {
-          return pp.province == n.machine.Province && pp.customer == n.machine.Customer && pp.machine == n.machine.Machine && pp.model == n.machine.Model
+          return p_item.province == n.machine.Province && p_item.customer == n.machine.Customer && p_item.machine == n.machine.Machine && p_item.model == n.machine.Model
         }
         // pp.province == n.machine.Province && pp.customer == n.machine.Customer && pp.machine == n.machine.Machine && pp.model == n.machine.Model
       })
+      console.log(indexP);
+
       if (indexP != -1) {
-        n.PIC = n.PIC?.name
+        n.PIC = n.PIC?.name ? n.PIC.name : ''
         p[indexP].data.push(n)
+        console.log(p[indexP].data);
+
       } else {
-        n.PIC = n.PIC?.name
+        n.PIC = n.PIC?.name ? n.PIC.name : ''
         let obj = {
           province: n?.machine?.Province,
           customer: n?.machine?.Customer,
@@ -503,9 +564,12 @@ async function genPM_by_year(year) {
           group: n?.group,
           sn: n?.machine ? n.machine['S/N'] : null,
           no: n?.no,
-          data: [n]
+          data: [n],
+          remark: n.remark
         }
         p.push(obj)
+        console.log(p[p.length-1]['data']);
+        
       }
       return p
     }, []).filter(item => item.province)
