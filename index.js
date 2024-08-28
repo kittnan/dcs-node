@@ -91,6 +91,7 @@ app.use("/report-pm-special", jwtValidate, require("./src/routes/report-pm-speci
 app.use("/master-category", jwtValidate, require("./src/routes/master-category"));
 app.use("/master-product", jwtValidate, require("./src/routes/master-product"));
 app.use("/master-customer", jwtValidate, require("./src/routes/master-customer"));
+app.use("/order", jwtValidate, require("./src/routes/order"));
 
 
 
