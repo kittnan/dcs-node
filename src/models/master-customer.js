@@ -16,6 +16,6 @@ const model = new Schema(
   { timestamps: true, versionKey: false, strict: true }
 );
 
-const UserModule = mongoose.model("customers", model);
+const UserModule = mongoose.model("master-customers", model);
 
 module.exports = UserModule;

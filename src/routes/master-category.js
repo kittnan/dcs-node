@@ -73,7 +73,7 @@ router.post("/createOrUpdate", async (req, res, next) => {
 
 router.get("/", async (req, res, next) => {
   try {
-    let { access, year, PIC } = req.query
+    let { } = req.query
     let con = [
       {
         $match: {
@@ -81,38 +81,34 @@ router.get("/", async (req, res, next) => {
         }
       }
     ]
-    if (access) {
-      access = JSON.parse(access)
-      con.push({
+    const data = await CATEGORY.aggregate(con);
+    res.json(data);
+  } catch (error) {
+    console.log("🚀 ~ error:", error);
+    res.sendStatus(500);
+  }
+});
+router.get("/withProduct", async (req, res, next) => {
+  try {
+    let { } = req.query
+    let con = [
+      {
         $match: {
-          access: {
-            $in: access
-          }
+          active: true
         }
-      })
-    }
-    if (year) {
-      con.push({
-        $match: {
-          year: Number(year)
+      },
+      {
+        $lookup:
+        {
+          from: "master-products",
+          localField: "category_id",
+          foreignField: "category_id",
+          as: "products"
         }
-      })
-    }
-    const dataTemp = await CATEGORY.aggregate(con);
-    if (PIC) {
-      let data = dataTemp[0].plans.map(item => {
-        item.data = item.data.filter(task => {
-          if (task.data.some(data => data.PIC == PIC)) return true
-          return false
-        })
-        return item
-      }).filter(item => item.data.length > 0)
-      dataTemp[0].plans = data
-      res.json(dataTemp);
-    } else {
-      res.json(dataTemp);
-    }
-
+      }
+    ]
+    const data = await CATEGORY.aggregate(con);
+    res.json(data);
   } catch (error) {
     console.log("🚀 ~ error:", error);
     res.sendStatus(500);

@@ -73,45 +73,17 @@ router.post("/createOrUpdate", async (req, res, next) => {
 
 router.get("/", async (req, res, next) => {
   try {
-    let { access, year, PIC } = req.query
+    let { } = req.query
     let con = [
       {
         $match: {
           active: true
         }
-      }
+      },
+
     ]
-    if (access) {
-      access = JSON.parse(access)
-      con.push({
-        $match: {
-          access: {
-            $in: access
-          }
-        }
-      })
-    }
-    if (year) {
-      con.push({
-        $match: {
-          year: Number(year)
-        }
-      })
-    }
-    const dataTemp = await CUSTOMER.aggregate(con);
-    if (PIC) {
-      let data = dataTemp[0].plans.map(item => {
-        item.data = item.data.filter(task => {
-          if (task.data.some(data => data.PIC == PIC)) return true
-          return false
-        })
-        return item
-      }).filter(item => item.data.length > 0)
-      dataTemp[0].plans = data
-      res.json(dataTemp);
-    } else {
-      res.json(dataTemp);
-    }
+    const data = await CUSTOMER.aggregate(con);
+    res.json(data);
 
   } catch (error) {
     console.log("🚀 ~ error:", error);
@@ -128,7 +100,7 @@ router.get("/code", async (req, res, next) => {
       },
       {
         $sort: {
-          category_id: -1
+          customer_id: -1
         }
       },
       {
@@ -140,7 +112,7 @@ router.get("/code", async (req, res, next) => {
     let newCode = 'C00001'
     if (data?.length != 0) {
       let codeData = data[0]
-      let sp = codeData.category_id.split('C')[1]
+      let sp = codeData.customer_id.split('C')[1]
       let number = (Number(sp) + 1).toString().padStart(5, '0')
       newCode = `C${number}`
     }

@@ -8,6 +8,10 @@ const model = new Schema(
     "description": String,
     "category_id": String,
     "base_price": Number,
+    "imgs": {
+      type: [],
+      default: [],
+    },
     active: {
       type: Boolean,
       default: true,
@@ -16,6 +20,6 @@ const model = new Schema(
   { timestamps: true, versionKey: false, strict: true }
 );
 
-const UserModule = mongoose.model("products", model);
+const UserModule = mongoose.model("master-products", model);
 
 module.exports = UserModule;
