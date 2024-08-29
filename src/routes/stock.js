@@ -77,7 +77,7 @@ router.post("/createOrUpdate", async (req, res, next) => {
 
 router.get("/", async (req, res, next) => {
   try {
-    let { } = req.query
+    let { qrcode } = req.query
     let con = [
       {
         $match: {
@@ -85,6 +85,16 @@ router.get("/", async (req, res, next) => {
         }
       }
     ]
+    if (qrcode) {
+      qrcode = JSON.parse(qrcode)
+      con.push({
+        $match: {
+          qrcode: {
+            $in: qrcode
+          }
+        }
+      })
+    }
     const data = await STOCK.aggregate(con);
     res.json(data);
   } catch (error) {
