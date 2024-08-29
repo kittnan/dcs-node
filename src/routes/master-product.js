@@ -73,13 +73,32 @@ router.post("/createOrUpdate", async (req, res, next) => {
 
 router.get("/", async (req, res, next) => {
   try {
-    let { } = req.query
+    let { category_id } = req.query
+    let con1 = [{
+      $match: {
+
+      }
+    }
+    ]
+
+    if (category_id) {
+      category_id = JSON.parse(category_id)
+      con1.push({
+        $match: {
+          category_id: {
+            $in: category_id
+          }
+        }
+      })
+    }
+
     let con = [
       {
         $match: {
           active: true
         }
       },
+      ...con1,
       {
         $lookup:
         {
