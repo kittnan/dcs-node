@@ -10,8 +10,9 @@ const moment = require("moment");
 router.post("/create", async (req, res, next) => {
   try {
     let payloads = req.body
-    payloads = payloads.filter(item=>!item._id)
+    payloads = payloads.filter(item => !item._id)
     let data = await mapFifo(payloads)
+    data = data.reduce((p, n) => p.concat(n), [])
     res.json(data);
   } catch (error) {
     console.log("🚀 ~ error:", error);
@@ -125,9 +126,9 @@ function mapFifo(payloads) {
       const element = payloads[i];
       const newFIFO = await getFifo()
       element.fifo = newFIFO
-      let data = await STOCK.insertMany([element])
+      let data = await STOCK.insertMany(element)
       arr.push(data)
-      if(i+1 == payloads.length){
+      if (i + 1 == payloads.length) {
         resolve(arr)
       }
     }
