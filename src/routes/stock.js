@@ -77,7 +77,7 @@ router.post("/createOrUpdate", async (req, res, next) => {
 
 router.get("/", async (req, res, next) => {
   try {
-    let { qrcode } = req.query
+    let { fifo } = req.query
     let con = [
       {
         $match: {
@@ -85,12 +85,12 @@ router.get("/", async (req, res, next) => {
         }
       }
     ]
-    if (qrcode) {
-      qrcode = JSON.parse(qrcode)
+    if (fifo) {
+      fifo = JSON.parse(fifo)
       con.push({
         $match: {
-          qrcode: {
-            $in: qrcode
+          fifo: {
+            $in: fifo
           }
         }
       })
