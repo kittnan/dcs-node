@@ -3,15 +3,15 @@ const Schema = mongoose.Schema;
 
 const model = new Schema(
   {
-    "fifo": String,
-    "lot": String,
-    "name": String,
+    "product_id": String,
+    "product_name": String,
     "category_id": String,
-    "base_price": Number,
-    "imgs": {
-      type: [],
-      default: [],
-    },
+    "qty": Number,
+    "lot": String,
+    "location_id": String,
+    "expire_date": Date,
+    "fifo": String,
+    "qrcode": String,
     active: {
       type: Boolean,
       default: true,

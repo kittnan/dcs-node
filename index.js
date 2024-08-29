@@ -93,6 +93,7 @@ app.use("/master-product", jwtValidate, require("./src/routes/master-product"));
 app.use("/master-customer", jwtValidate, require("./src/routes/master-customer"));
 app.use("/master-location", jwtValidate, require("./src/routes/master-location"));
 app.use("/order", jwtValidate, require("./src/routes/order"));
+app.use("/stock", jwtValidate, require("./src/routes/stock"));
 
 
 
