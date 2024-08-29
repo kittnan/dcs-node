@@ -10,6 +10,7 @@ const moment = require("moment");
 router.post("/create", async (req, res, next) => {
   try {
     let payloads = req.body
+    payloads = payloads.filter(item=>!item._id)
     let items = await mapFifo(payloads)
     const data = await STOCK.insertMany(items);
     res.json(data);
