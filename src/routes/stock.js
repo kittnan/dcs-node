@@ -11,8 +11,7 @@ router.post("/create", async (req, res, next) => {
   try {
     let payloads = req.body
     payloads = payloads.filter(item=>!item._id)
-    let items = await mapFifo(payloads)
-    const data = await STOCK.insertMany(items);
+    let data = await mapFifo(payloads)
     res.json(data);
   } catch (error) {
     console.log("🚀 ~ error:", error);
@@ -126,7 +125,8 @@ function mapFifo(payloads) {
       const element = payloads[i];
       const newFIFO = await getFifo()
       element.fifo = newFIFO
-      arr.push(element)
+      let data = await STOCK.insertOne(element)
+      arr.push(data)
       if(i+1 == payloads.length){
         resolve(arr)
       }
