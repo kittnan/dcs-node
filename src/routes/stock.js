@@ -127,8 +127,10 @@ function mapFifo(payloads) {
       const newFIFO = await getFifo()
       element.fifo = newFIFO
       arr.push(element)
+      if(i+1 == payloads.length){
+        resolve(arr)
+      }
     }
-    resolve(arr)
   })
 }
 async function getFifo() {
