@@ -125,7 +125,7 @@ function mapFifo(payloads) {
       const element = payloads[i];
       const newFIFO = await getFifo()
       element.fifo = newFIFO
-      let data = await STOCK.insertOne(element)
+      let data = await STOCK.insertMany([element])
       arr.push(data)
       if(i+1 == payloads.length){
         resolve(arr)
