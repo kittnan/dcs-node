@@ -77,7 +77,7 @@ router.post("/createOrUpdate", async (req, res, next) => {
 
 router.get("/", async (req, res, next) => {
   try {
-    let { fifo } = req.query
+    let { fifo, lot } = req.query
     let con = [
       {
         $match: {
@@ -91,6 +91,16 @@ router.get("/", async (req, res, next) => {
         $match: {
           fifo: {
             $in: fifo
+          }
+        }
+      })
+    }
+    if (lot) {
+      lot = JSON.parse(lot)
+      con.push({
+        $match: {
+          lot: {
+            $in: lot
           }
         }
       })
