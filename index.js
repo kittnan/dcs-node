@@ -58,8 +58,7 @@ const jwtValidate = (req, res, next) => {
 
 
 
-// let Users = require("./src/routes/users");
-// app.use("/users", jwtValidate, Users);
+app.use("/users", jwtValidate, require("./src/routes/users"));
 
 app.use("/auth", require("./src/routes/auth"));
 
@@ -83,10 +82,10 @@ app.use("/report-pm", jwtValidate, require("./src/routes/report-pm"));
 app.use("/report-pm-special", jwtValidate, require("./src/routes/report-pm-special"));
 
 
-// app.use("/tasks", jwtValidate, require("./src/routes/tasks"));
+app.use("/tasks", jwtValidate, require("./src/routes/tasks"));
 
 
-// app.use("/pm-plan", jwtValidate, require("./src/routes/pm-plan"));
+app.use("/pm-plan", jwtValidate, require("./src/routes/pm-plan"));
 
 app.use("/master-category", jwtValidate, require("./src/routes/master-category"));
 app.use("/master-product", jwtValidate, require("./src/routes/master-product"));
