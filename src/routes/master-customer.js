@@ -73,15 +73,24 @@ router.post("/createOrUpdate", async (req, res, next) => {
 
 router.get("/", async (req, res, next) => {
   try {
-    let { } = req.query
+    let { customer_id } = req.query
     let con = [
       {
         $match: {
           active: true
         }
       },
-
     ]
+    if (customer_id) {
+      customer_id = JSON.parse(customer_id)
+      con.push({
+        $match: {
+          customer_id: {
+            $in: customer_id
+          }
+        }
+      })
+    }
     const data = await CUSTOMER.aggregate(con);
     res.json(data);
 
