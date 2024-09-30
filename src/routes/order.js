@@ -4,6 +4,7 @@ var mongoose = require("mongodb");
 const { ObjectId } = mongoose;
 require("dotenv").config()
 const ORDER = require("../models/order");
+const moment = require("moment");
 // let axios = require("axios");
 
 router.post("/create", async (req, res, next) => {
@@ -77,7 +78,6 @@ router.get("/", async (req, res, next) => {
     let con = [
       {
         $match: {
-          active: true
         }
       }
     ]
@@ -128,7 +128,7 @@ router.get("/code", async (req, res, next) => {
       },
       {
         $sort: {
-          category_id: -1
+          po_number: -1
         }
       },
       {
@@ -137,12 +137,13 @@ router.get("/code", async (req, res, next) => {
     ]
 
     let data = await ORDER.aggregate(con)
-    let newCode = 'CAT00001'
+    let newCode = `${moment().format('POYYMM00001')}`
     if (data?.length != 0) {
       let codeData = data[0]
-      let sp = codeData.category_id.split('CAT')[1]
-      let number = (Number(sp) + 1).toString().padStart(5, '0')
-      newCode = `CAT${number}`
+      let sp = codeData.po_number.split('')
+      let number = sp[6] + sp[7] + sp[8] + sp[9] + sp[10]
+      number = (parseFloat(number) + 1).toString().padStart(5, '0')
+      newCode = moment().format(`POYYMM${number}`)
     }
     res.json({ code: newCode })
   } catch (error) {

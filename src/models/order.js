@@ -5,8 +5,10 @@ const model = new Schema(
   {
     "order_id": String,
     "customer_id": String,
+    "customer_name": String,
     "order_date": Date,
     "po_number": String,
+    "status": String,
     "po_date": Date,
     "delivery_date": Date,
     "total_amount": Number,
@@ -18,7 +20,8 @@ const model = new Schema(
       {
         "product_id": String,
         "product_name": String,
-        "quantity": Number,
+        "status": String,
+        "qty": Number,
         "price": Number,
         "total_price": Number
       },
