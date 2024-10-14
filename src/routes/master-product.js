@@ -73,7 +73,7 @@ router.post("/createOrUpdate", async (req, res, next) => {
 
 router.get("/", async (req, res, next) => {
   try {
-    let { category_id } = req.query
+    let { category_id, product_id } = req.query
     let con1 = [{
       $match: {
 
@@ -87,6 +87,16 @@ router.get("/", async (req, res, next) => {
         $match: {
           category_id: {
             $in: category_id
+          }
+        }
+      })
+    }
+    if (product_id) {
+      product_id = JSON.parse(product_id)
+      con1.push({
+        $match: {
+          _id: {
+            $in: product_id.map(id => new ObjectId(id))
           }
         }
       })
