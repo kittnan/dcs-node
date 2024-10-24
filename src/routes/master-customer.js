@@ -73,7 +73,7 @@ router.post("/createOrUpdate", async (req, res, next) => {
 
 router.get("/", async (req, res, next) => {
   try {
-    let { customer_id } = req.query
+    let { customer_id, sale_id } = req.query
     let con = [
       {
         $match: {
@@ -87,6 +87,16 @@ router.get("/", async (req, res, next) => {
         $match: {
           customer_id: {
             $in: customer_id
+          }
+        }
+      })
+    }
+    if (sale_id) {
+      sale_id = JSON.parse(sale_id)
+      con.push({
+        $match: {
+          "sales._id": {
+            $in: sale_id
           }
         }
       })
