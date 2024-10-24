@@ -6,6 +6,8 @@ const model = new Schema(
     "customer_id": String,
     "customer_name": String,
     "products": [],
+    "sales": [
+    ],
     active: {
       type: Boolean,
       default: true,

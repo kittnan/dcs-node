@@ -32,6 +32,25 @@ router.get('', async (req, res) => {
     res.send(500)
   }
 })
+router.get('/getSale', async (req, res) => {
+  try {
+ 
+    res.json(
+      await MasterUser.aggregate(
+        [
+          {
+            $match: {
+              permission:"sale"
+            }
+          },
+        ]
+      )
+    )
+  } catch (error) {
+    console.log("🚀 ~ error:", error)
+    res.send(500)
+  }
+})
 router.post('/create', async (req, res) => {
   try {
     res.json(
