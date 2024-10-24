@@ -22,6 +22,7 @@ const model = new Schema(
         "product_name": String,
         "status": String,
         "qty": Number,
+        "qty_withdraw" :Number,
         "price": Number,
         "total_price": Number
       },

@@ -74,13 +74,34 @@ router.post("/createOrUpdate", async (req, res, next) => {
 
 router.get("/", async (req, res, next) => {
   try {
-    let { access, year, PIC } = req.query
+    
+    let { access, year, PIC, po_number,status } = req.query
     let con = [
       {
         $match: {
         }
       }
     ]
+    if (status) {
+      status = JSON.parse(status)
+      con.push({
+        $match: {
+          status: {
+            $in: status
+          }
+        }
+      })
+    }
+    if (po_number) {
+      po_number = JSON.parse(po_number)
+      con.push({
+        $match: {
+          po_number: {
+            $in: po_number
+          }
+        }
+      })
+    }
     if (access) {
       access = JSON.parse(access)
       con.push({
