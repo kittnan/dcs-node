@@ -73,7 +73,7 @@ router.post("/createOrUpdate", async (req, res, next) => {
 
 router.get("/", async (req, res, next) => {
   try {
-    let { } = req.query
+    let { _id } = req.query
     let con = [
       {
         $match: {
@@ -81,6 +81,13 @@ router.get("/", async (req, res, next) => {
         }
       }
     ]
+    if(_id){
+      con.push({
+        $match:{
+          _id: new ObjectId(_id)
+        }
+      })
+    }
     const data = await CATEGORY.aggregate(con);
     res.json(data);
   } catch (error) {
