@@ -17,15 +17,15 @@ const model = new Schema(
       "employee_name": String
     },
     "products": [
-      {
-        "product_id": String,
-        "product_name": String,
-        "status": String,
-        "qty": Number,
-        "qty_withdraw" :Number,
-        "price": Number,
-        "total_price": Number
-      },
+      // {
+      //   "product_id": String,
+      //   "product_name": String,
+      //   "status": String,
+      //   "qty": Number,
+      //   "qty_withdraw" :Number,
+      //   "price": Number,
+      //   "total_price": Number
+      // },
     ]
   },
   { timestamps: true, versionKey: false, strict: true }
