@@ -9,7 +9,9 @@ const moment = require("moment");
 
 router.post("/create", async (req, res, next) => {
   try {
+    
     let payloads = req.body
+    console.log(payloads);
     payloads = payloads.filter(item => !item._id)
     let data = await mapFifo(payloads)
     data = data.reduce((p, n) => p.concat(n), [])
@@ -182,7 +184,7 @@ router.get("/getQty", async (req, res, next) => {
         }
       })
     }
-    const data = await STOCK.aggregate([...con,{$count:'count'}]);
+    const data = await STOCK.aggregate([...con, { $count: 'count' }]);
     res.json(data);
   } catch (error) {
     console.log("🚀 ~ error:", error);
@@ -224,6 +226,8 @@ function mapFifo(payloads) {
       const newFIFO = await getFifo()
       element.fifo = newFIFO
       let data = await STOCK.insertMany(element)
+      console.log(data);
+      
       arr.push(data)
       if (i + 1 == payloads.length) {
         resolve(arr)
@@ -243,6 +247,7 @@ async function getFifo() {
         fifo: -1
       }
     },
+   
     {
       $limit: 1
     }
@@ -299,6 +304,37 @@ router.get("/code", async (req, res, next) => {
     res.sendStatus(500);
   }
 });
+
+
+router.post("/get_fifo", async (req, res, next) => {
+  try {
+    let payloads = req.body
+    console.log(payloads);
+
+    let data = await STOCK.aggregate(
+      [
+        {
+          $match: {
+            product_id: payloads.product_id,
+            active: true,
+            fifo: {
+              $nin: payloads.ignore
+            }
+          }
+        },
+        { $sort: { expire_date: 1, fifo: 1 } },
+        {
+          $limit: 1
+        }
+
+      ]
+    )
+    res.json(data[0]); // Return the result of the update operation
+  } catch (error) {
+    res.sendStatus(500);
+  }
+});
+
 
 
 module.exports = router;

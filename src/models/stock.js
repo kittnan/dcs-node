@@ -12,6 +12,8 @@ const model = new Schema(
     "expire_date": Date,
     "fifo": String,
     "qrcode": String,
+    "receive": Object,
+    "withdraw" : Object,
     active: {
       type: Boolean,
       default: true,

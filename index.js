@@ -7,6 +7,7 @@ let mongoose = require("mongoose");
 let compression = require("compression");
 let fileUpload = require("express-fileupload");
 
+
 mongoose.set("strictQuery", false);
 
 const dotenv = require("dotenv");
@@ -18,9 +19,12 @@ dotenv.config({ path: `.env` });
 console.log("PORT:", process.env.PORT);
 let mongooseConnect = require("./connect");
 const port = process.env.PORT;
+
 const server = app.listen(port, () => {
   console.log("Listening on  port " + server.address().port);
 });
+
+
 
 app.use(morgan("tiny"));
 app.use(bodyParser.json({ limit: "50mb" }));
@@ -30,13 +34,16 @@ app.use(compression());
 app.use(fileUpload())
 
 
+
 app.use(function (req, res, next) {
   res.setHeader("Access-Control-Allow-Origin", "*");
   res.setHeader("Access-Control-Allow-Methods", "GET, POST ,PUT ,DELETE");
-  res.setHeader("Access-Control-Allow-Headers", "X-Requested-with,Content-Type");
+  res.setHeader("Access-Control-Allow-Headers", "Origin, Accept,X-Requested-with,Content-Type");
   res.setHeader("Access-Control-Allow-Credentials", true);
   next();
 });
+
+
 
 const jwtValidate = (req, res, next) => {
   try {
