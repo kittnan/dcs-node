@@ -74,8 +74,8 @@ router.post("/createOrUpdate", async (req, res, next) => {
 
 router.get("/", async (req, res, next) => {
   try {
-    
-    let { access, year, PIC, po_number,status } = req.query
+
+    let { access, year, PIC, po_number, status, sort } = req.query
     let con = [
       {
         $match: {
@@ -117,6 +117,12 @@ router.get("/", async (req, res, next) => {
         $match: {
           year: Number(year)
         }
+      })
+    }
+    if (sort) {
+      sort = JSON.parse(sort)
+      con.push({
+        $sort: sort
       })
     }
     const dataTemp = await ORDER.aggregate(con);

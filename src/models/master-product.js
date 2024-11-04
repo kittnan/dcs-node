@@ -5,6 +5,7 @@ const model = new Schema(
   {
     "product_id": String,
     "product_name": String,
+    "product_unit": String,
     "description": String,
     "category_id": String,
     "base_price": Number,

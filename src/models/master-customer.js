@@ -5,6 +5,8 @@ const model = new Schema(
   {
     "customer_id": String,
     "customer_name": String,
+    "customer_address": String,
+    "customer_tel": String,
     "products": [],
     "sales": [
     ],
