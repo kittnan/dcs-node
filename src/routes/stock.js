@@ -322,7 +322,7 @@ router.post("/get_fifo", async (req, res, next) => {
             }
           }
         },
-        { $sort: { expire_date: 1, fifo: 1 } },
+        { $sort: { expire_date: 1 } },
         {
           $limit: 1
         }
