@@ -6,7 +6,10 @@ const model = new Schema(
     "product_id": String,
     "product_name": String,
     "category_id": String,
-    "qty": Number,
+    "qty": {
+      type:"Number",
+      default:0
+    },
     "lot": String,
     "location_id": String,
     "expire_date": Date,
