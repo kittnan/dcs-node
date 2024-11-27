@@ -7,7 +7,6 @@ const model = new Schema(
     "product_name": String,
     "category_id": String,
     "qty": Number,
-    "balance": Number,
     "lot": String,
     "location_id": String,
     "expire_date": Date,
