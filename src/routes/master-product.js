@@ -186,4 +186,43 @@ router.get("/code", async (req, res, next) => {
   }
 });
 
+router.post("/updateStockOnProducts", async (req, res, next) => {
+  try {
+    let payloads = req.body
+    let data = await PRODUCT.aggregate(
+      [
+        {
+          $match:
+          {
+            product_id: {
+              $in: payloads.data
+            }
+          }
+        },
+        {
+          $lookup:
+          {
+            from: "stocks",
+            localField: "product_id",
+            foreignField: "product_id",
+            as: "stocks"
+          }
+        },
+        {
+          $addFields: {
+            sumBalance: {
+              $sum: "$stocks.balance"
+            }
+          }
+        }
+
+      ]
+    )
+    res.json(data);
+  } catch (error) {
+    console.log("🚀 ~ error:", error)
+    res.sendStatus(500);
+  }
+});
+
 module.exports = router;

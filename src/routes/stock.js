@@ -9,7 +9,7 @@ const moment = require("moment");
 
 router.post("/create", async (req, res, next) => {
   try {
-    
+
     let payloads = req.body
     console.log(payloads);
     payloads = payloads.filter(item => !item._id)
@@ -228,7 +228,7 @@ function mapFifo(payloads) {
       element.fifo = newFIFO
       let data = await STOCK.insertMany(element)
       console.log(data);
-      
+
       arr.push(data)
       if (i + 1 == payloads.length) {
         resolve(arr)
@@ -248,7 +248,7 @@ async function getFifo() {
         fifo: -1
       }
     },
-   
+
     {
       $limit: 1
     }
@@ -335,6 +335,8 @@ router.post("/get_fifo", async (req, res, next) => {
     res.sendStatus(500);
   }
 });
+
+
 
 
 
