@@ -7,12 +7,21 @@ const model = new Schema(
     "product_name": String,
     "category_id": String,
     "qty": Number,
+    "balance": Number,
     "lot": String,
     "location_id": String,
     "expire_date": Date,
     "fifo": String,
     "qrcode": String,
-    "action": [],
+    "action": [
+      {
+        status: String,
+        timeStamp: Date,
+        qty: Number,
+        balance: Number,
+        detail: Object,
+      }
+    ],
     active: {
       type: Boolean,
       default: true,
