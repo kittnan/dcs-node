@@ -17,6 +17,7 @@ const model = new Schema(
       type: Boolean,
       default: true,
     },
+    action: []
   },
   { timestamps: true, versionKey: false, strict: true }
 );
