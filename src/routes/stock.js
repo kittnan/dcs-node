@@ -185,7 +185,16 @@ router.get("/getQty", async (req, res, next) => {
         }
       })
     }
-    const data = await STOCK.aggregate([...con, { $count: 'count' }]);
+
+    // const data = await STOCK.aggregate([...con, { $count: 'count' }]);
+    const data = await STOCK.aggregate([...con, {
+      $group: {
+        _id: null,
+        count: { $sum: "$balance" }
+      }
+    }
+    ]);
+
     res.json(data);
   } catch (error) {
     console.log("🚀 ~ error:", error);
