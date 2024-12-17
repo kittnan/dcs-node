@@ -26,7 +26,8 @@ const model = new Schema(
       //   "price": Number,
       //   "total_price": Number
       // },
-    ]
+    ],
+    "historyScan": []
   },
   { timestamps: true, versionKey: false, strict: true }
 );

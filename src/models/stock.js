@@ -20,6 +20,7 @@ const model = new Schema(
         qty: Number,
         balance: Number,
         detail: Object,
+        remark:String
       }
     ],
     active: {

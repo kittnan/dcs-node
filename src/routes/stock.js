@@ -7,6 +7,7 @@ const STOCK = require("../models/stock");
 // let axios = require("axios");
 const moment = require("moment");
 
+
 router.post("/create", async (req, res, next) => {
   try {
 
@@ -76,7 +77,21 @@ router.post("/createOrUpdate", async (req, res, next) => {
     res.sendStatus(500);
   }
 });
-
+router.post("/getFIFO-withdraw", async (req, res, next) => {
+  try {
+    let data = await STOCK.aggregate([
+      {
+        $match: {
+          fifo: req.body.data
+        }
+      }
+    ])
+    res.json(data)
+  } catch (error) {
+    console.log("🚀 ~ error:", error);
+    res.sendStatus(500);
+  }
+})
 
 router.get("/", async (req, res, next) => {
   try {
@@ -128,6 +143,7 @@ router.get("/", async (req, res, next) => {
         }
       })
     }
+
     const data = await STOCK.aggregate(con);
     res.json(data);
   } catch (error) {
