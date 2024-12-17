@@ -109,6 +109,54 @@ router.get("/", async (req, res, next) => {
     res.sendStatus(500);
   }
 });
+router.get("/name", async (req, res, next) => {
+  try {
+    let { customer_id, sale_id } = req.query
+    let con = [
+      {
+        $match: {
+          active: true
+        }
+      }
+
+    ]
+    if (customer_id) {
+      customer_id = JSON.parse(customer_id)
+      con.push({
+        $match: {
+          customer_id: {
+            $in: customer_id
+          }
+        }
+      })
+    }
+    if (sale_id) {
+      sale_id = JSON.parse(sale_id)
+      con.push({
+        $match: {
+          "sales._id": {
+            $in: sale_id
+          }
+        }
+      })
+    }
+    con.push({
+      $project: {
+        customer_id: "$customer_id",
+        customer_name: "$customer_name",
+        customer_address: "$customer_address",
+        customer_tel: "$customer_tel",
+        _id: "$_id",
+      }
+    })
+    const data = await CUSTOMER.aggregate(con);
+    res.json(data);
+
+  } catch (error) {
+    console.log("🚀 ~ error:", error);
+    res.sendStatus(500);
+  }
+});
 router.get("/code", async (req, res, next) => {
   try {
     let con = [
