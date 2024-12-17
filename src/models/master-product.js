@@ -9,6 +9,7 @@ const model = new Schema(
     "description": String,
     "category_id": String,
     "base_price": Number,
+    "minimum": Number,
     "imgs": {
       type: [],
       default: [],

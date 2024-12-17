@@ -225,4 +225,33 @@ router.post("/updateStockOnProducts", async (req, res, next) => {
   }
 });
 
+
+
+
+
+
+router.post("/cleanData", async (req, res, next) => {
+  try {
+    let payloads = req.body
+    let data = await PRODUCT.aggregate(
+      [
+        {
+          $match : {
+            active : true
+          }
+        },
+        {
+          $project: {
+            product_id: '$product_id',
+            product_name: '$product_name'
+          }
+        },
+      ]
+    )
+    res.json(data);
+  } catch (error) {
+    console.log("🚀 ~ error:", error)
+    res.sendStatus(500);
+  }
+});
 module.exports = router;
