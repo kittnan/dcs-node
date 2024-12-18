@@ -243,7 +243,9 @@ router.post("/cleanData", async (req, res, next) => {
         {
           $project: {
             product_id: '$product_id',
-            product_name: '$product_name'
+            product_name: '$product_name',
+            category_id: '$category_id',
+            minimum:'$minimum'
           }
         },
       ]

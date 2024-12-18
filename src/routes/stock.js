@@ -720,7 +720,41 @@ router.post("/getDataChart", async (req, res, next) => {
 
 
 
+router.post("/getStockClean", async (req, res, next) => {
+  try {
+    let payloads = req.body
+    let data = await STOCK.aggregate(
+      [
+        {
+          $match : {
+            active : true
+          }
+        },
+        {
+          $group: {
+            _id: {
+              product_id: '$product_id',
+              category_id: '$category_id'
+            },
+            totalQty: { $sum: '$balance' }
+          }
+        },
+        {
+          $project: {
+            _id: 0,
+            product_id: '$_id.product_id',
+            category_id: '$_id.category_id',
+            Qty: '$totalQty'
+          }
+        }
+      ]
+    )
+    res.json(data);
 
+  } catch (error) {
+    res.sendStatus(500);
+  }
+});
 
 
 module.exports = router;
