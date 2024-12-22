@@ -757,4 +757,103 @@ router.post("/getStockClean", async (req, res, next) => {
 });
 
 
+
+router.post("/getStockSortTop10", async (req, res, next) => {
+  try {
+    let payloads = req.body
+    console.log(payloads);
+    
+    let data = await STOCK.aggregate(
+      [
+        {
+          $match: {
+            'action.status': {
+              $in: [
+                RegExp('receive', 'i'),
+                RegExp('withdraw', 'i')
+              ]
+            }
+          }
+        },
+        {
+          $match: {
+            'action.timeStamp': {
+              $gte: moment(payloads.start).startOf('day').toDate(),
+              $lte: moment(payloads.end).endOf('day').toDate()
+            }
+          }
+        },
+        { $unwind: '$action' },
+        {
+          $project: {
+            product_id: "$product_id",
+            product_name: "$product_name",
+            qty: "$action.qty",
+            status: "$action.status",
+            timeStamp: "$action.timeStamp"
+          }
+        },
+        {
+          $group: {
+            _id: {
+              product_id: "$product_id",
+              product_name: "$product_name",
+              status: "$status",
+              timeStamp: "$timeStamp"
+            },
+            totalQtyPerTime: {
+              $sum: "$qty" // Sum quantities per timeStamp
+            }
+          }
+        },
+        {
+          $group: {
+            _id: {
+              product_id: "$_id.product_id",
+              product_name: "$_id.product_name",
+              status: "$_id.status"
+            },
+            totalQty: {
+              $sum: "$totalQtyPerTime" // Sum quantities across timeStamps
+            },
+            timeStamps: {
+              $push: {
+                timeStamp: "$_id.timeStamp",
+                qty: "$totalQtyPerTime" // Include quantity per timestamp
+              }
+            }
+          }
+        },
+        {
+          $match: {
+            "_id.status": /withdraw/i
+          }
+        },
+        {
+          $project: {
+            _id: 0,
+            product_id: "$_id.product_id",
+            product_name: "$_id.product_name",
+            status: "$_id.status",
+            totalQty: "$totalQty",
+            timeStamps: "$timeStamps" // Include the timeStamps and their quantities
+          }
+        },
+        {
+          $sort: {
+            totalQty: -1
+          }
+        },
+        {
+          $limit: 10
+        }
+      ],
+    );
+
+    res.json(data);
+
+  } catch (error) {
+    res.sendStatus(500);
+  }
+});
 module.exports = router;
