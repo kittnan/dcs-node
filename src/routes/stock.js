@@ -856,4 +856,78 @@ router.post("/getStockSortTop10", async (req, res, next) => {
     res.sendStatus(500);
   }
 });
+
+
+
+
+
+
+
+
+
+
+
+router.post("/getExpireTop10", async (req, res, next) => {
+  try {
+    let payloads = req.body
+    let data = await STOCK.aggregate(
+      [
+        {
+          $match: {
+            active: true
+          }
+        },
+        {
+          $sort: {
+            expire_date: 1 
+          }
+        },
+        {
+          $group: {
+            _id: {
+              product_id: "$product_id"
+            },
+            expire_date: {
+              $min: "$expire_date"
+            },
+            fifo: {
+              $first: "$fifo"
+            },
+            product_name: {
+              $first: "$product_name"
+            } 
+          }
+        },
+        {
+          $project: {
+            _id: 0,
+            product_id: "$_id.product_id",
+            product_name: 1,
+            expire_date: 1,
+            fifo: 1
+          }
+        },
+        {
+          $sort: {
+            expire_date: 1 
+          }
+        },
+        {
+          $limit: 10
+        }
+      ]
+    );
+
+    res.json(data);
+
+  } catch (error) {
+    res.sendStatus(500);
+  }
+
+
+
+
+
+  
+});
 module.exports = router;
