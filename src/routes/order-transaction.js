@@ -38,6 +38,33 @@ router.get("/", async (req, res, next) => {
     res.sendStatus(500);
   }
 });
+router.get("/getRunNo", async (req, res, next) => {
+  try {
+    let con = [
+      {
+        $match: {
+          createdAt: {
+            $gte: moment().startOf('month').toDate(),
+            $lte: moment().endOf('month').toDate()
+          }
+        }
+      },
+      {
+        $sort: {
+          run_no: -1
+        }
+      },
+      {
+        $limit: 1
+      }
+    ]
+    const data = await ORDER_TRANSACTION.aggregate(con)
+    res.json(data);
+  } catch (error) {
+    console.log("🚀 ~ error:", error);
+    res.sendStatus(500);
+  }
+});
 
 
 

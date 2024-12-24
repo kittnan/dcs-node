@@ -75,7 +75,7 @@ router.post("/createOrUpdate", async (req, res, next) => {
 router.get("/", async (req, res, next) => {
   try {
 
-    let { access, year, PIC, po_number, status, sort } = req.query
+    let { access, year, PIC, po_number, status, sort, order_date, po_date, delivery_date } = req.query
     let con = [
       {
         $match: {
@@ -119,6 +119,43 @@ router.get("/", async (req, res, next) => {
         }
       })
     }
+
+    if (order_date) {
+      order_date = JSON.parse(order_date)
+      con.push({
+        $match: {
+          order_date:{
+            $gte: moment(order_date[0],'YYYY-MM-DD').startOf('day').toDate(),
+            $lte: moment(order_date[1],'YYYY-MM-DD').endOf('day').toDate()
+          }
+        }
+      })
+    }
+
+    if (po_date) {
+      po_date = JSON.parse(po_date)
+      con.push({
+        $match: {
+          po_date:{
+            $gte: moment(po_date[0],'YYYY-MM-DD').startOf('day').toDate(),
+            $lte: moment(po_date[1],'YYYY-MM-DD').endOf('day').toDate()
+          }
+        }
+      })
+    }
+
+    if (delivery_date) {
+      delivery_date = JSON.parse(delivery_date)
+      con.push({
+        $match: {
+          delivery_date:{
+            $gte: moment(delivery_date[0],'YYYY-MM-DD').startOf('day').toDate(),
+            $lte: moment(delivery_date[1],'YYYY-MM-DD').endOf('day').toDate()
+          }
+        }
+      })
+    }
+
     if (sort) {
       sort = JSON.parse(sort)
       con.push({
@@ -168,9 +205,14 @@ router.get("/code", async (req, res, next) => {
     if (data?.length != 0) {
       let codeData = data[0]
       let sp = codeData.po_number.split('')
-      let number = sp[6] + sp[7] + sp[8] + sp[9] + sp[10]
-      number = (parseFloat(number) + 1).toString().padStart(5, '0')
-      newCode = moment().format(`POYYMM${number}`)
+      const poMonth = sp[2] + sp[3] + sp[4] + sp[5]
+      if (poMonth != moment().format('YYMM')) {
+        newCode = `${moment().format('POYYMM00001')}`
+      } else {
+        let number = sp[6] + sp[7] + sp[8] + sp[9] + sp[10]
+        number = (parseFloat(number) + 1).toString().padStart(5, '0')
+        newCode = moment().format(`POYYMM${number}`)
+      }
     }
     res.json({ code: newCode })
   } catch (error) {

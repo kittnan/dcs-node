@@ -11,6 +11,7 @@ const model = new Schema(
     "status": String,
     "po_date": Date,
     "delivery_date": Date,
+    "delivery_by": String,
     "total_amount": Number,
     "created_by": {
       "employee_id": String,
