@@ -859,14 +859,6 @@ router.post("/getStockSortTop10", async (req, res, next) => {
 
 
 
-
-
-
-
-
-
-
-
 router.post("/getExpireTop10", async (req, res, next) => {
   try {
     let payloads = req.body
@@ -930,4 +922,55 @@ router.post("/getExpireTop10", async (req, res, next) => {
 
   
 });
+
+
+
+router.post("/getQtyClean", async (req, res, next) => {
+  try {
+    let payloads = req.body
+    let data = await STOCK.aggregate(
+      [
+        {
+          $match: {
+            active: true
+          }
+        },
+        {
+          $group: {
+            _id: {
+              product_id: "$product_id",
+              product_name: "$product_name"
+            },
+            qty: {
+              $sum: "$balance"
+            }
+          }
+        },
+        {
+          $project: {
+            _id: 0,
+            product_id: "$_id.product_id",
+            product_name: "$_id.product_name",
+            qty: "$qty"
+          }
+        }
+      ]
+    );
+
+    res.json(data);
+
+  } catch (error) {
+    res.sendStatus(500);
+  }
+
+
+
+
+
+  
+});
+
+
+
+
 module.exports = router;
