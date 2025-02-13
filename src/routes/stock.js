@@ -151,6 +151,64 @@ router.get("/", async (req, res, next) => {
     res.sendStatus(500);
   }
 });
+router.get("/exportExcel", async (req, res, next) => {
+  try {
+    let { fifo, lot, category_id, product_id } = req.query
+    let con = [
+      {
+        $match: {
+          
+        }
+      }
+    ]
+    if (fifo) {
+      fifo = JSON.parse(fifo)
+      con.push({
+        $match: {
+          fifo: {
+            $in: fifo
+          }
+        }
+      })
+    }
+    if (lot) {
+      lot = JSON.parse(lot)
+      con.push({
+        $match: {
+          lot: {
+            $in: lot
+          }
+        }
+      })
+    }
+    if (category_id) {
+      category_id = JSON.parse(category_id)
+      con.push({
+        $match: {
+          category_id: {
+            $in: category_id
+          }
+        }
+      })
+    }
+    if (product_id) {
+      product_id = JSON.parse(product_id)
+      con.push({
+        $match: {
+          product_id: {
+            $in: product_id
+          }
+        }
+      })
+    }
+
+    const data = await STOCK.aggregate(con);
+    res.json(data);
+  } catch (error) {
+    console.log("🚀 ~ error:", error);
+    res.sendStatus(500);
+  }
+});
 router.get("/getQty", async (req, res, next) => {
   try {
     let { fifo, lot, category_id, product_id } = req.query
