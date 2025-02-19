@@ -11,7 +11,7 @@ let path = ''
 
 router.get('', async (req, res) => {
   try {
-    let { active = 'true', no, _id, status, start, end } = req.query
+    let { active = 'true', no, _id, status, start, end, finishReportStart, finishReportEnd } = req.query
     let con = [
       {
         $match: {}
@@ -57,6 +57,24 @@ router.get('', async (req, res) => {
         }
       })
     }
+    if (finishReportStart) {
+      con.push({
+        $match: {
+          finishDate: {
+            $gte: moment(finishReportStart, 'DD-MM-YY').startOf('day').toDate()
+          }
+        }
+      })
+    }
+    if (finishReportEnd) {
+      con.push({
+        $match: {
+          finishDate: {
+            $lte: moment(finishReportEnd, 'DD-MM-YY').endOf('day').toDate()
+          }
+        }
+      })
+    }
     const result = await REPORT.aggregate(con).sort({
       createdAt: -1
     })
@@ -89,7 +107,7 @@ router.get('/multi', async (req, res) => {
       })
     }
     if (_id) {
-       _id = JSON.parse(_id)
+      _id = JSON.parse(_id)
       con.push({
         $match: {
           _id: {
@@ -201,7 +219,7 @@ router.put("/insert/:id", async function (req, res, next) {
 
 
 //find
-router.post("/getByCondition",async function (req, res, next) {
+router.post("/getByCondition", async function (req, res, next) {
   const payload = req.body;
   try {
     let data = await REPORT.find(payload)
