@@ -17,6 +17,12 @@ const model = new Schema(
       "employee_id": String,
       "employee_name": String
     },
+    "finish_by": {
+      "employee_id": String,
+      "employee_name": String
+    },
+    "finish_date": Date,
+    "finish_date_local": String,
     "products": [
       // {
       //   "product_id": String,
