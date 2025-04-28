@@ -192,20 +192,25 @@ router.post("/updateStockOnProducts", async (req, res, next) => {
     let data = await PRODUCT.aggregate(
       [
         {
-          $match:
-          {
+          $match: {
             product_id: {
               $in: payloads.data
             }
           }
         },
         {
-          $lookup:
-          {
+          $lookup: {
             from: "stocks",
             localField: "product_id",
             foreignField: "product_id",
-            as: "stocks"
+            as: "stocks",
+            pipeline: [
+              {
+                $match: {
+                  active: true
+                }
+              }
+            ]
           }
         },
         {
@@ -215,9 +220,9 @@ router.post("/updateStockOnProducts", async (req, res, next) => {
             }
           }
         }
-
       ]
     )
+
     res.json(data);
   } catch (error) {
     console.log("🚀 ~ error:", error)
@@ -236,8 +241,8 @@ router.post("/cleanData", async (req, res, next) => {
     let data = await PRODUCT.aggregate(
       [
         {
-          $match : {
-            active : true
+          $match: {
+            active: true
           }
         },
         {
@@ -245,7 +250,7 @@ router.post("/cleanData", async (req, res, next) => {
             product_id: '$product_id',
             product_name: '$product_name',
             category_id: '$category_id',
-            minimum:'$minimum'
+            minimum: '$minimum'
           }
         },
       ]
