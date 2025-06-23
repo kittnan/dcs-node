@@ -66,6 +66,36 @@ router.get("/getRunNo", async (req, res, next) => {
   }
 });
 
+router.get("/getOrderHistoryByFIFO", async (req, res, next) => {
+  try {
+    let { fifo } = req.query
+    if (!fifo) throw 'no fifo'
+    let con = [
+      [
+        {
+          $match:
+          {
+            "productsSend.fifo": fifo
+          }
+        },
+        {
+          $lookup:
+          {
+            from: "orders",
+            localField: "po_number",
+            foreignField: "po_number",
+            as: "order"
+          }
+        }
+      ]
+    ]
+    const data = await ORDER_TRANSACTION.aggregate(con)
+    res.json(data);
+  } catch (error) {
+    console.log("🚀 ~ error:", error);
+    res.sendStatus(500);
+  }
+});
 
 
 module.exports = router;
