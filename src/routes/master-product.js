@@ -207,10 +207,16 @@ router.post("/updateStockOnProducts", async (req, res, next) => {
             pipeline: [
               {
                 $match: {
-                  active: true
+                  active: true,
+                  $expr: {
+                    $eq: ["$category_id", "$$product_category_id"]
+                  }
                 }
               }
-            ]
+            ],
+            let: {
+              product_category_id: "$category_id"
+            }
           }
         },
         {

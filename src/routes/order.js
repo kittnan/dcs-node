@@ -75,7 +75,7 @@ router.post("/createOrUpdate", async (req, res, next) => {
 router.get("/", async (req, res, next) => {
   try {
 
-    let { access, year, PIC, po_number, status, sort, order_date, po_date, delivery_date } = req.query
+    let { access, year, PIC, po_number, status, sort, order_date, po_date, delivery_date, customer_name } = req.query
     let con = [
       {
         $match: {
@@ -102,6 +102,16 @@ router.get("/", async (req, res, next) => {
         }
       })
     }
+    if (customer_name) {
+      customer_name = JSON.parse(customer_name)
+      con.push({
+        $match: {
+          customer_name: {
+            $in: customer_name.map(name => new RegExp(name, 'i'))
+          }
+        }
+      })
+    }
     if (access) {
       access = JSON.parse(access)
       con.push({
@@ -124,9 +134,9 @@ router.get("/", async (req, res, next) => {
       order_date = JSON.parse(order_date)
       con.push({
         $match: {
-          order_date:{
-            $gte: moment(order_date[0],'YYYY-MM-DD').startOf('day').toDate(),
-            $lte: moment(order_date[1],'YYYY-MM-DD').endOf('day').toDate()
+          order_date: {
+            $gte: moment(order_date[0], 'YYYY-MM-DD').startOf('day').toDate(),
+            $lte: moment(order_date[1], 'YYYY-MM-DD').endOf('day').toDate()
           }
         }
       })
@@ -136,9 +146,9 @@ router.get("/", async (req, res, next) => {
       po_date = JSON.parse(po_date)
       con.push({
         $match: {
-          po_date:{
-            $gte: moment(po_date[0],'YYYY-MM-DD').startOf('day').toDate(),
-            $lte: moment(po_date[1],'YYYY-MM-DD').endOf('day').toDate()
+          po_date: {
+            $gte: moment(po_date[0], 'YYYY-MM-DD').startOf('day').toDate(),
+            $lte: moment(po_date[1], 'YYYY-MM-DD').endOf('day').toDate()
           }
         }
       })
@@ -148,9 +158,9 @@ router.get("/", async (req, res, next) => {
       delivery_date = JSON.parse(delivery_date)
       con.push({
         $match: {
-          delivery_date:{
-            $gte: moment(delivery_date[0],'YYYY-MM-DD').startOf('day').toDate(),
-            $lte: moment(delivery_date[1],'YYYY-MM-DD').endOf('day').toDate()
+          delivery_date: {
+            $gte: moment(delivery_date[0], 'YYYY-MM-DD').startOf('day').toDate(),
+            $lte: moment(delivery_date[1], 'YYYY-MM-DD').endOf('day').toDate()
           }
         }
       })
