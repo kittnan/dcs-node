@@ -9,28 +9,28 @@ const MasterMC = require("../models/master-machine");
 // ? ------------------------------------------------------ Master
 // * add
 // updateObjectId()
-async function updateObjectId(){
+async function updateObjectId() {
   let data1 = await MasterMC.aggregate([
     {
-      $match:{}
+      $match: {}
     }
   ])
-  let formData = data1.map(d=>{
+  let formData = data1.map(d => {
     d.machine_id = new ObjectId(d.machine_id)
     return {
-      updateOne:{
-        filter:{
+      updateOne: {
+        filter: {
           _id: d._id
         },
-        update:{
+        update: {
           $set: d
         }
       }
     }
   })
 
-let dd=  await MasterMC.bulkWrite(formData)
-console.log("🚀 ~ dd:", dd)
+  let dd = await MasterMC.bulkWrite(formData)
+  console.log("🚀 ~ dd:", dd)
 }
 
 
@@ -47,10 +47,31 @@ router.post("/", async function (req, res, next) {
 
 // find all
 
+router.get("/all", async function (req, res, next) {
+  try {
+    let data = await MasterMC.aggregate([
+      {
+        $match: {
+         
+        }
+      }
+    ])
+    res.json(data)
+  } catch (error) {
+    res.send(500)
+  }
+});
+
 router.get("/", async function (req, res, next) {
   try {
     const payload = req.body;
-    let data = await MasterMC.find(payload)
+    let data = await MasterMC.aggregate([
+      {
+        $match: {
+          active: "active"
+        }
+      }
+    ])
     res.json(data)
   } catch (error) {
     res.send(500)
@@ -86,11 +107,11 @@ router.delete("/:id", async function (req, res, next) {
 
 
 
- 
+
 
 
 //find
-router.post("/getByCondition",async function (req, res, next) {
+router.post("/getByCondition", async function (req, res, next) {
   const payload = req.body;
   try {
     let data = await MasterMC.find(payload)
@@ -100,7 +121,7 @@ router.post("/getByCondition",async function (req, res, next) {
   }
 });
 
-router.post("/DelByCondition",async function (req, res, next) {
+router.post("/DelByCondition", async function (req, res, next) {
   const payload = req.body;
   try {
     let data = await MasterMC.deleteMany(payload);
@@ -112,6 +133,38 @@ router.post("/DelByCondition",async function (req, res, next) {
 
 });
 
+router.get("/models", async (req, res, next) => {
+  try {
+    const data = await MasterMC.aggregate([
+      {
+        $group: {
+          _id: "$Model",
+        }
+      }
+    ]
+    )
+    res.json(data);
+  } catch (error) {
+    console.log("🚀 ~ error:", error);
+    res.sendStatus(500);
+  }
+});
+router.get("/brands", async (req, res, next) => {
+  try {
+    const data = await MasterMC.aggregate([
+      {
+        $group: {
+          _id: "$Brand",
+        }
+      }
+    ]
+    )
+    res.json(data);
+  } catch (error) {
+    console.log("🚀 ~ error:", error);
+    res.sendStatus(500);
+  }
+});
 
 
 

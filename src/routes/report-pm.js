@@ -83,6 +83,62 @@ router.get('', async (req, res) => {
     console.log("🚀 ~ error:", error)
   }
 })
+router.get('/table', async (req, res) => {
+  try {
+    let { active = 'true', no, _id, status, start, end } = req.query
+    let con = [
+    ]
+    const matchStage = {
+      $match: {}
+    }
+    if (active) {
+      active = active == 'true' ? true : false
+      matchStage.$match.active = active
+    }
+    if (_id) {
+      matchStage.$match._id = new ObjectId(_id)
+    }
+    if (status) {
+      matchStage.$match.status = status
+    }
+    if (start) {
+      matchStage.$match.createdAt = {
+        $gte: moment(start, 'DD-MM-YY').startOf('day').toDate()
+      }
+    }
+    if (end) {
+      if (!matchStage.$match.createdAt) {
+        matchStage.$match.createdAt = {}
+      }
+      matchStage.$match.createdAt.$lte = moment(end, 'DD-MM-YY').endOf('day').toDate()
+    }
+
+
+    const projectStage = {
+      $project: {
+        no: 1,
+        createdAt: 1,
+        province: "$customer.Province",
+        customer: "$customer.Customer",
+        model: "$machine.Machine",
+        serviceType: "$serviceType.name",
+        status: 1,
+        finishDate: 1,
+        installDate: "$machine.installDate",
+      }
+    }
+
+    con.push(matchStage)
+    con.push(projectStage)
+
+    const result = await REPORT.aggregate(con).sort({
+      createdAt: -1
+    })
+    res.json(result)
+  } catch (error) {
+    console.log("🚀 ~ error:", error)
+  }
+})
 router.get('/multi', async (req, res) => {
   try {
     let { active = 'true', no, _id, status } = req.query

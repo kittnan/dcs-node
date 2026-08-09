@@ -61,6 +61,63 @@ router.get('', async (req, res) => {
         }
       })
     }
+
+    const result = await REPORT.aggregate(con).sort({
+      createdAt: -1
+    })
+    res.json(result)
+  } catch (error) {
+    console.log("🚀 ~ error:", error)
+  }
+})
+router.get('/table', async (req, res) => {
+  try {
+    let { active = 'true', no, _id, status, start, end } = req.query
+    let con = [
+    ]
+    const matchStage = {
+      $match: {}
+    }
+    if (active) {
+      active = active == 'true' ? true : false
+      matchStage.$match.active = active
+    }
+    if (_id) {
+      matchStage.$match._id = new ObjectId(_id)
+    }
+    if (status) {
+      matchStage.$match.status = status
+    }
+    if (start) {
+      matchStage.$match.createdAt = {
+        $gte: moment(start, 'DD-MM-YY').startOf('day').toDate()
+      }
+    }
+    if (end) {
+      if (!matchStage.$match.createdAt) {
+        matchStage.$match.createdAt = {}
+      }
+      matchStage.$match.createdAt.$lte = moment(end, 'DD-MM-YY').endOf('day').toDate()
+    }
+
+
+    const projectStage = {
+      $project: {
+        no: 1,
+        createdAt: 1,
+        province: "$customer.Province",
+        customer: "$customer.Customer",
+        model: "$machine.Machine",
+        serviceType: "$serviceType.name",
+        status: 1,
+        finishDate: 1,
+        installDate: "$machine.installDate",
+      }
+    }
+
+    con.push(matchStage)
+    con.push(projectStage)
+
     const result = await REPORT.aggregate(con).sort({
       createdAt: -1
     })
@@ -71,7 +128,19 @@ router.get('', async (req, res) => {
 })
 router.get('/multi', async (req, res) => {
   try {
-    let { active = 'true', no, _id, status, customer, machine, report, service, type, user } = req.query
+
+    // sn
+    // null
+    // finishPeriodDateStart
+    // "2026-07-31T17:00:00.000Z"
+    // finishPeriodDateEnd
+    // "2026-07-31T17:00:00.000Z"
+    // installPeriodDateStart
+    // "2026-07-31T17:00:00.000Z"
+    // installPeriodDateEnd
+    // "2026-08-30T17:00:00.000Z"
+
+    let { active = 'true', no, _id, status, customer, machine, report, service, type, user, sn, finishPeriodDateStart, finishPeriodDateEnd, installPeriodDateStart, installPeriodDateEnd } = req.query
     let con = [
       {
         $match: {
@@ -79,42 +148,87 @@ router.get('/multi', async (req, res) => {
         }
       }
     ]
+
+    let matchStage = {}
     report = JSON.parse(report)
     type = JSON.parse(type)
 
     customer = JSON.parse(customer)
     if (customer) {
-      con.push({
-        $match: {
-          'customer.Customer': customer
-        }
-      })
+      matchStage['customer.Customer'] = customer
     }
     machine = JSON.parse(machine)
     if (machine) {
-      con.push({
-        $match: {
-          'machine.Machine': machine
-        }
-      })
+      matchStage['machine.Machine'] = machine
     }
     service = JSON.parse(service)
     if (service) {
-      con.push({
-        $match: {
-          'serviceType.value': service
-        }
-      })
+      matchStage['serviceType.value'] = service
+
     }
     user = JSON.parse(user)
     if (user) {
+      matchStage['userActive._id'] = user._id
+    }
+    sn = JSON.parse(sn)
+    if (sn) {
+      matchStage['machine.S/N'] = sn
+    }
+
+    finishPeriodDateStart = JSON.parse(finishPeriodDateStart)
+    finishPeriodDateEnd = JSON.parse(finishPeriodDateEnd)
+    if (finishPeriodDateStart && finishPeriodDateEnd) {
+      matchStage['finishDate'] = {
+        $gte: moment(finishPeriodDateStart).startOf('day').toDate(),
+        $lte: moment(finishPeriodDateEnd).endOf('day').toDate()
+      }
+    } else if (finishPeriodDateStart) {
+      matchStage['finishDate'] = {
+        $gte: moment(finishPeriodDateStart).startOf('day').toDate()
+      }
+    } else if (finishPeriodDateEnd) {
+      matchStage['finishDate'] = {
+        $lte: moment(finishPeriodDateEnd).endOf('day').toDate()
+      }
+    }
+
+    installPeriodDateStart = JSON.parse(installPeriodDateStart)
+    installPeriodDateEnd = JSON.parse(installPeriodDateEnd)
+    if (installPeriodDateStart && installPeriodDateEnd) {
+      matchStage['machine.installDate'] = {
+        $gte: moment(installPeriodDateStart).startOf('day').toDate(),
+        $lte: moment(installPeriodDateEnd).endOf('day').toDate()
+      }
+    } else if (installPeriodDateStart) {
+      matchStage['machine.installDate'] = {
+        $gte: moment(installPeriodDateStart).startOf('day').toDate()
+      }
+    } else if (installPeriodDateEnd) {
+      matchStage['machine.installDate'] = {
+        $lte: moment(installPeriodDateEnd).endOf('day').toDate()
+      }
+    }
+
+    if (Object.keys(matchStage).length > 0) {
       con.push({
-        $match: {
-          'userActive._id': user._id
-        }
+        $match: matchStage
       })
     }
 
+    const projectStage = {
+      $project: {
+        no: 1,
+        createdAt: 1,
+        province: "$customer.Province",
+        customer: "$customer.Customer",
+        model: "$machine.Machine",
+        serviceType: "$serviceType.name",
+        status: 1,
+        finishDate: 1,
+        installDate: "$machine.installDate",
+      }
+    }
+    con.push(projectStage)
     if (type && report) {
       if (type == 'engineer' && report == 'report') {
         let result = await REPORT.aggregate(con)
@@ -165,7 +279,7 @@ router.get('/multi', async (req, res) => {
           return item
         })
         let resultPM = await REPORT_PM.aggregate(con)
-        result = result.map(item => {
+        resultPM = resultPM.map(item => {
           item.type = 'engineer'
           item.report = 'pm'
           return item
@@ -181,7 +295,7 @@ router.get('/multi', async (req, res) => {
           return item
         })
         let resultPM = await SPECIAL_PM.aggregate(con)
-        result = result.map(item => {
+        resultPM = resultPM.map(item => {
           item.type = 'special'
           item.report = 'pm'
           return item

@@ -73,6 +73,7 @@ router.post("/createOrUpdate", async (req, res, next) => {
 
 router.get("/", async (req, res, next) => {
   try {
+    await deleteBase64()
     let { customer_id, sale_id } = req.query
     let con = [
       {
@@ -109,6 +110,45 @@ router.get("/", async (req, res, next) => {
     res.sendStatus(500);
   }
 });
+
+async function deleteBase64() {
+  const countDoc = await CUSTOMER.countDocuments({});
+  const batchSize = 50
+  const totalBatches = Math.ceil(countDoc / batchSize);
+
+  for (let batch = 0; batch < totalBatches; batch++) {
+    const skip = batch * batchSize;
+    const customers = await CUSTOMER.find({}).skip(skip).limit(batchSize);
+
+    for (const customer of customers) {
+      let isChanged = false;
+      const products = customer.products || [];
+
+      for (const product of products) {
+        if (!Array.isArray(product.imgs) || product.imgs.length === 0) continue;
+
+        for (const img of product.imgs) {
+          if (!img) continue;
+          if (Object.prototype.hasOwnProperty.call(img, "view")) {
+            delete img.view;
+            isChanged = true;
+          }
+          if (Object.prototype.hasOwnProperty.call(img, "blobUrl")) {
+            delete img.blobUrl;
+            isChanged = true;
+          }
+        }
+      }
+
+      if (isChanged) {
+        customer.markModified("products");
+        await customer.save();
+      }
+    }
+  }
+
+}
+
 router.get("/name", async (req, res, next) => {
   try {
     let { customer_id, sale_id } = req.query
