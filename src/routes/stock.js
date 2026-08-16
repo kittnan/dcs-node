@@ -7,6 +7,389 @@ const STOCK = require("../models/stock");
 // let axios = require("axios");
 const moment = require("moment");
 
+const CUSTOMER = require("../models/master-customer");
+const ORDER = require("../models/order");
+const PRODUCT = require("../models/master-product");
+const ORDER_TRANSACTION = require("../models/order-transaction");
+
+// orderTranDel()
+async function orderTranDel() {
+  try {
+    const batchSize = 100;
+    const totalCount = await ORDER_TRANSACTION.countDocuments();
+    const totalBatches = Math.ceil(totalCount / batchSize);
+
+    for (let batch = 0; batch < totalBatches; batch++) {
+      const orders = await ORDER_TRANSACTION.aggregate([
+        {
+          $match: {}
+        },
+        {
+          $sort: {
+            _id: 1
+          }
+        },
+        {
+          $project: {
+            _id: 1,
+            products: 1
+          }
+        },
+        {
+          $skip: batch * batchSize
+        },
+        {
+          $limit: batchSize
+        }
+      ]);
+
+      const operations = [];
+
+      orders.forEach((order) => {
+        const products = Array.isArray(order.products) ? order.products : [];
+        let changed = false;
+
+        const nextProducts = products.map((product) => {
+          const imgs = Array.isArray(product.imgs) ? product.imgs : [];
+
+          const nextImgs = imgs.map((img) => {
+            if (!img || typeof img !== "object") {
+              return img;
+            }
+
+            const nextImg = { ...img };
+            let imgChanged = false;
+
+            if (Object.prototype.hasOwnProperty.call(nextImg, "view")) {
+              delete nextImg.view;
+              imgChanged = true;
+            }
+
+            if (Object.prototype.hasOwnProperty.call(nextImg, "blobUrl")) {
+              delete nextImg.blobUrl;
+              imgChanged = true;
+            }
+
+            if (imgChanged) {
+              changed = true;
+            }
+
+            return nextImg;
+          });
+
+          return {
+            ...product,
+            imgs: nextImgs,
+          };
+        });
+
+        if (changed) {
+          operations.push({
+            updateOne: {
+              filter: { _id: order._id },
+              update: {
+                $set: {
+                  products: nextProducts,
+                },
+              },
+            },
+          });
+        }
+      });
+
+      if (operations.length > 0) {
+        await ORDER_TRANSACTION.bulkWrite(operations);
+        console.log(`Batch ${batch + 1}/${totalBatches} processed successfully.`);
+      }
+
+    }
+
+    return true;
+
+  } catch (error) {
+    console.error("Error deleting orders:", error);
+    throw error;
+  }
+}
+// orderDel()
+async function orderDel() {
+  try {
+    const batchSize = 100;
+    const totalCount = await ORDER.countDocuments();
+    const totalBatches = Math.ceil(totalCount / batchSize);
+
+    for (let batch = 0; batch < totalBatches; batch++) {
+      const orders = await ORDER.aggregate([
+        {
+          $match: {}
+        },
+        {
+          $sort: {
+            _id: 1
+          }
+        },
+        {
+          $project: {
+            _id: 1,
+            products: 1
+          }
+        },
+        {
+          $skip: batch * batchSize
+        },
+        {
+          $limit: batchSize
+        }
+      ]);
+
+      const operations = [];
+
+      orders.forEach((order) => {
+        const products = Array.isArray(order.products) ? order.products : [];
+        let changed = false;
+
+        const nextProducts = products.map((product) => {
+          const imgs = Array.isArray(product.imgs) ? product.imgs : [];
+
+          const nextImgs = imgs.map((img) => {
+            if (!img || typeof img !== "object") {
+              return img;
+            }
+
+            const nextImg = { ...img };
+            let imgChanged = false;
+
+            if (Object.prototype.hasOwnProperty.call(nextImg, "view")) {
+              delete nextImg.view;
+              imgChanged = true;
+            }
+
+            if (Object.prototype.hasOwnProperty.call(nextImg, "blobUrl")) {
+              delete nextImg.blobUrl;
+              imgChanged = true;
+            }
+
+            if (imgChanged) {
+              changed = true;
+            }
+
+            return nextImg;
+          });
+
+          return {
+            ...product,
+            imgs: nextImgs,
+          };
+        });
+
+        if (changed) {
+          operations.push({
+            updateOne: {
+              filter: { _id: order._id },
+              update: {
+                $set: {
+                  products: nextProducts,
+                },
+              },
+            },
+          });
+        }
+      });
+
+      if (operations.length > 0) {
+        await ORDER.bulkWrite(operations);
+        console.log(`Batch ${batch + 1}/${totalBatches} processed successfully.`);
+      }
+
+    }
+
+    return true;
+
+  } catch (error) {
+    console.error("Error deleting orders:", error);
+    throw error;
+  }
+}
+
+// async function productDel() {
+//   try {
+//     const batchSize = 100;
+//     const totalCount = await PRODUCT.countDocuments();
+//     const totalBatches = Math.ceil(totalCount / batchSize);
+
+//     for (let batch = 0; batch < totalBatches; batch++) {
+//       const products = await PRODUCT.find().lean()
+//         .skip(batch * batchSize)
+//         .limit(batchSize);
+
+//       const operations = [];
+
+//       // products.forEach((product) => {
+//       //   const imgs = Array.isArray(product.imgs) ? product.imgs : [];
+//       //   let changed = false;
+
+//       //   const nextImgs = imgs.map((img) => {
+
+//       //     const nextImgs = imgs.map((img) => {
+//       //       if (!img || typeof img !== "object") {
+//       //         return img;
+//       //       }
+
+//       //       const nextImg = { ...img };
+//       //       let imgChanged = false;
+
+//       //       if (Object.prototype.hasOwnProperty.call(nextImg, "view")) {
+//       //         delete nextImg.view;
+//       //         imgChanged = true;
+//       //       }
+
+//       //       if (Object.prototype.hasOwnProperty.call(nextImg, "blobUrl")) {
+//       //         delete nextImg.blobUrl;
+//       //         imgChanged = true;
+//       //       }
+
+//       //       if (imgChanged) {
+//       //         changed = true;
+//       //       }
+
+//       //       return nextImg;
+//       //     });
+
+//       //     return {
+//       //       ...product,
+//       //       imgs: nextImgs,
+//       //     };
+//       //   });
+
+//       //   if (changed) {
+//       //     operations.push({
+//       //       updateOne: {
+//       //         filter: { _id: product._id },
+//       //         update: {
+//       //           $set: {
+//       //             imgs: nextImgs,
+//       //           },
+//       //         },
+//       //       },
+//       //     });
+//       //   }
+//       // });
+
+//       products.forEach((product) => {
+//         let imgs = Array.isArray(product.imgs) ? product.imgs : [];
+//         imgs = imgs.map((img) => {
+
+//           if (img.imgs) {
+//            img = { ...img.imgs };
+//           }
+
+//           return img;
+
+//         })
+//         operations.push({
+//           updateOne: {
+//             filter: { _id: product._id },
+//             update: {
+//               $set: {
+//                 imgs: imgs,
+//               },
+//             },
+//           },
+//         });
+//       })
+
+//       if (operations.length > 0) {
+//         await PRODUCT.bulkWrite(operations);
+//         console.log(`Batch ${batch + 1}/${totalBatches} processed successfully.`);
+//       }
+
+//     }
+
+//     return true;
+
+//   } catch (error) {
+//     console.error("Error deleting products:", error);
+//     throw error;
+//   }
+// }
+// async function customerDel() {
+//   try {
+//     const batchSize = 100;
+//     const totalCount = await CUSTOMER.countDocuments();
+//     const totalBatches = Math.ceil(totalCount / batchSize);
+
+//     for (let batch = 0; batch < totalBatches; batch++) {
+//       const customers = await CUSTOMER.find()
+//         .skip(batch * batchSize)
+//         .limit(batchSize);
+
+//       const operations = [];
+
+//       customers.forEach((customer) => {
+//         const products = Array.isArray(customer.products) ? customer.products : [];
+//         let changed = false;
+
+//         const nextProducts = products.map((product) => {
+//           const imgs = Array.isArray(product.imgs) ? product.imgs : [];
+
+//           const nextImgs = imgs.map((img) => {
+//             if (!img || typeof img !== "object") {
+//               return img;
+//             }
+
+//             const nextImg = { ...img };
+//             let imgChanged = false;
+
+//             if (Object.prototype.hasOwnProperty.call(nextImg, "view")) {
+//               delete nextImg.view;
+//               imgChanged = true;
+//             }
+
+//             if (Object.prototype.hasOwnProperty.call(nextImg, "blobUrl")) {
+//               delete nextImg.blobUrl;
+//               imgChanged = true;
+//             }
+
+//             if (imgChanged) {
+//               changed = true;
+//             }
+
+//             return nextImg;
+//           });
+
+//           return {
+//             ...product,
+//             imgs: nextImgs,
+//           };
+//         });
+
+//         if (changed) {
+//           operations.push({
+//             updateOne: {
+//               filter: { _id: customer._id },
+//               update: {
+//                 $set: {
+//                   products: nextProducts,
+//                 },
+//               },
+//             },
+//           });
+//         }
+//       });
+
+//       if (operations.length > 0) {
+//         await CUSTOMER.bulkWrite(operations);
+//       }
+
+//     }
+
+//     return true;
+
+//   } catch (error) {
+//     console.error("Error deleting customers:", error);
+//     throw error;
+//   }
+// }
 
 router.post("/create", async (req, res, next) => {
   try {
@@ -157,7 +540,7 @@ router.get("/exportExcel", async (req, res, next) => {
     let con = [
       {
         $match: {
-          
+
         }
       }
     ]
@@ -784,8 +1167,8 @@ router.post("/getStockClean", async (req, res, next) => {
     let data = await STOCK.aggregate(
       [
         {
-          $match : {
-            active : true
+          $match: {
+            active: true
           }
         },
         {
@@ -820,7 +1203,7 @@ router.post("/getStockSortTop10", async (req, res, next) => {
   try {
     let payloads = req.body
     console.log(payloads);
-    
+
     let data = await STOCK.aggregate(
       [
         {
@@ -929,7 +1312,7 @@ router.post("/getExpireTop10", async (req, res, next) => {
         },
         {
           $sort: {
-            expire_date: 1 
+            expire_date: 1
           }
         },
         {
@@ -945,7 +1328,7 @@ router.post("/getExpireTop10", async (req, res, next) => {
             },
             product_name: {
               $first: "$product_name"
-            } 
+            }
           }
         },
         {
@@ -959,7 +1342,7 @@ router.post("/getExpireTop10", async (req, res, next) => {
         },
         {
           $sort: {
-            expire_date: 1 
+            expire_date: 1
           }
         },
         {
@@ -978,7 +1361,7 @@ router.post("/getExpireTop10", async (req, res, next) => {
 
 
 
-  
+
 });
 
 
@@ -1025,7 +1408,7 @@ router.post("/getQtyClean", async (req, res, next) => {
 
 
 
-  
+
 });
 
 
