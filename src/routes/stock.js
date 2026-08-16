@@ -486,6 +486,91 @@ router.get("/two_active", async (req, res, next) => {
   }
 });
 
+router.get("/timeline", async (req, res, next) => {
+  try {
+    let { fifo, lot, category_id, product_id } = req.query
+    let matchStage = {
+      active: {
+        $in: [true, false]
+      }
+    };
+    if (fifo) {
+      fifo = JSON.parse(fifo)
+      matchStage.fifo = {
+        $in: fifo
+      }
+    }
+    if (lot) {
+      lot = JSON.parse(lot)
+      matchStage.lot = {
+        $in: lot
+      }
+    }
+    if (category_id) {
+      category_id = JSON.parse(category_id)
+      matchStage.category_id = {
+        $in: category_id
+      }
+    }
+    if (product_id) {
+      product_id = JSON.parse(product_id)
+      matchStage.product_id = {
+        $in: product_id
+      }
+    }
+
+    const lookupPipeline = [
+      {
+        $unwind: "$action"
+      },
+      {
+        $lookup: {
+          from: "orders",
+          localField: "action.remark",
+          foreignField: "po_number",
+          as: "result"
+        }
+      },
+      {
+        $unwind: {
+          path: "$result",
+          preserveNullAndEmptyArrays: true
+        }
+      },
+      {
+        $replaceWith: {
+          $mergeObjects: [
+            "$$ROOT",
+            "$action",
+            {
+              customer_name: "$result.customer_name"
+            }
+          ]
+        }
+      },
+      {
+        $project: {
+          action: 0,
+          result: 0
+        }
+      }
+    ]
+    const data = await STOCK.aggregate([
+      { $match: matchStage },
+      ...lookupPipeline,
+      {
+        $sort: {
+          timeStamp: -1
+        }
+      }
+    ]);
+    res.json(data);
+  } catch (error) {
+    console.log("🚀 ~ error:", error);
+    res.sendStatus(500);
+  }
+});
+
 
 
 

@@ -13,6 +13,7 @@ const model = new Schema(
     "expire_date": Date,
     "fifo": String,
     "qrcode": String,
+    "account_code": String,
     "action": [
       {
         status: String,

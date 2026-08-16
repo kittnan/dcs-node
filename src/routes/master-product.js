@@ -153,6 +153,38 @@ router.get("/", async (req, res, next) => {
     res.sendStatus(500);
   }
 });
+
+router.get("/productsName", async (req, res, next) => {
+  try {
+    let con = [
+      {
+        $match: {
+          active: true
+        }
+      },
+      {
+        $group: {
+          _id: "$product_name",
+          category_id: { $first: "$category_id" }
+        }
+      },
+      {
+        $project: {
+          _id: 0,
+          product_name: "$_id",
+          category_id: 1
+        }
+      }
+    ];
+
+    const data = await PRODUCT.aggregate(con);
+    res.json(data);
+  } catch (error) {
+    console.log("🚀 ~ error:", error);
+    res.sendStatus(500);
+  }
+});
+
 router.get("/code", async (req, res, next) => {
   try {
     let con = [

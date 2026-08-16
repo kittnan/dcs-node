@@ -81,14 +81,42 @@ router.get("/", async (req, res, next) => {
         }
       }
     ]
-    if(_id){
+    if (_id) {
       con.push({
-        $match:{
+        $match: {
           _id: new ObjectId(_id)
         }
       })
     }
     const data = await CATEGORY.aggregate(con);
+    res.json(data);
+  } catch (error) {
+    console.log("🚀 ~ error:", error);
+    res.sendStatus(500);
+  }
+});
+router.post("/fields", async (req, res, next) => {
+  try {
+    const { fields } = req.body
+    if (!fields || !Array.isArray(fields) || fields.length === 0) {
+      return res.status(400).json({ error: "Invalid fields parameter" });
+    }
+    const projectStage = {
+      $project: fields.reduce((acc, field) => {
+        acc[field] = 1;
+        return acc;
+      }, {
+        _id: 1 // Always include the _id field
+      })
+    };
+    const data = await CATEGORY.aggregate([
+      {
+        $match: {
+          active: true
+        }
+      },
+      projectStage
+    ]);
     res.json(data);
   } catch (error) {
     console.log("🚀 ~ error:", error);
