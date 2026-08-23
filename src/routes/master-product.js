@@ -73,7 +73,7 @@ router.post("/createOrUpdate", async (req, res, next) => {
 
 router.get("/", async (req, res, next) => {
   try {
-    let { category_id, product_id, product_id2 } = req.query
+    let { category_id, product_id, product_id2, account_code, product_name } = req.query
     let con1 = [{
       $match: {
 
@@ -107,6 +107,26 @@ router.get("/", async (req, res, next) => {
         $match: {
           product_id: {
             $in: product_id2
+          }
+        }
+      })
+    }
+    if (account_code) {
+      // account_code = JSON.parse(account_code)
+      con1.push({
+        $match: {
+          account_code: {
+            $regex: new RegExp(account_code, 'i')
+          }
+        }
+      })
+    }
+    if (product_name) {
+      // product_name = JSON.parse(product_name)
+      con1.push({
+        $match: {
+          product_name: {
+            $regex: new RegExp(product_name, 'i')
           }
         }
       })
@@ -154,6 +174,34 @@ router.get("/", async (req, res, next) => {
   }
 });
 
+router.get("/productsNameAll", async (req, res, next) => {
+  try {
+    let con = [
+      {
+        $group: {
+          _id: "$product_name",
+          category_id: { $first: "$category_id" },
+          account_code: { $first: "$account_code" },
+        }
+      },
+      {
+        $project: {
+          _id: 0,
+          product_name: "$_id",
+          category_id: 1,
+          account_code: 1
+        }
+      }
+    ];
+
+    const data = await PRODUCT.aggregate(con);
+    res.json(data);
+  } catch (error) {
+    console.log("🚀 ~ error:", error);
+    res.sendStatus(500);
+  }
+});
+
 router.get("/productsName", async (req, res, next) => {
   try {
     let con = [
@@ -165,14 +213,45 @@ router.get("/productsName", async (req, res, next) => {
       {
         $group: {
           _id: "$product_name",
-          category_id: { $first: "$category_id" }
+          category_id: { $first: "$category_id" },
+          account_code: { $first: "$account_code" },
         }
       },
       {
         $project: {
           _id: 0,
           product_name: "$_id",
-          category_id: 1
+          category_id: 1,
+          account_code: 1
+        }
+      }
+    ];
+
+    const data = await PRODUCT.aggregate(con);
+    res.json(data);
+  } catch (error) {
+    console.log("🚀 ~ error:", error);
+    res.sendStatus(500);
+  }
+});
+
+router.get("/accountCode", async (req, res, next) => {
+  try {
+    let con = [
+      {
+        $match: {
+          account_code: { $ne: null }
+        }
+      },
+      {
+        $group: {
+          _id: "$account_code"
+        }
+      },
+      {
+        $project: {
+          _id: 0,
+          account_code: "$_id"
         }
       }
     ];

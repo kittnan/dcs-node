@@ -226,6 +226,7 @@ router.get('/multi', async (req, res) => {
         status: 1,
         finishDate: 1,
         installDate: "$machine.installDate",
+        path_file:1
       }
     }
     con.push(projectStage)
