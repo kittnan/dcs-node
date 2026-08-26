@@ -221,12 +221,13 @@ router.get('/multi', async (req, res) => {
         createdAt: 1,
         province: "$customer.Province",
         customer: "$customer.Customer",
-        model: "$machine.Machine",
+        model: "$machine.Model",
         serviceType: "$serviceType.name",
         status: 1,
         finishDate: 1,
         installDate: "$machine.installDate",
-        path_file:1
+        path_file:1,
+        sn: "$machine.S/N"
       }
     }
     con.push(projectStage)
